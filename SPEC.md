@@ -247,12 +247,41 @@ paper:
 Rows win on information per screen and on not shipping an experimental API to a car.
 Tiles win only on the literal arrangement. **Nico to pick from the preview.**
 
-### One expectation to set
+### Charts — possible, and gated by review rather than by the API
 
-**"Graphical" cannot mean a chart.** The Car App Library gives no drawing canvas: the only
-template with a `Surface` is `MapWithContentTemplate`, which is for maps and drags in the
-map-specific quality rules (WE-2, WE-5, MR-1). A temperature curve or a rain graph is not
-available to a templated app at any effort level.
+An earlier version of this section said a rain graph was "not available at any effort
+level". **That was wrong**, and the correction matters because it reopens a real option.
+
+What is true: there is no live drawing surface. The only template with a `Surface` is
+`MapWithContentTemplate`, there is no `WebView` in any template, and on AAOS a templated
+app may not provide functionality through its own activities except setup, settings and
+sign-in while parked — so an iframe or an embedded web chart is genuinely out.
+
+What is *not* true is that the pixels are unreachable. Checked against the AAR:
+`CarIconConstraints.DEFAULT` permits `{TYPE_BITMAP, TYPE_RESOURCE}`, so
+`IconCompat.createWithBitmap()` is an accepted `CarIcon`. A chart rendered to a bitmap —
+by the backend as a PNG, which costs almost nothing since the backend already exists — can
+go in `Pane.setImage()`, `Row.setImage(…, IMAGE_TYPE_LARGE)` or a `GridItem` image.
+
+The real gate is **IU-1**, whose default is that app elements display no images, with four
+exceptions. The third is the one that matters here:
+
+> Apps can display images and photographs to aid in driving decision-making.
+
+A precipitation chart has a genuine argument under that clause. It is not a certainty —
+it is a reviewer's judgement, and the review is blocking at open testing and production.
+Two further constraints are firm: **SA-1 forbids animation**, so a static chart and not a
+radar loop (canvas animation is allowed only while parked); and a bitmap does not follow
+the car's theme, so it has to be rendered for a black background or served twice.
+
+**Unverified, and it decides whether this is worth anything:** how large the image slots
+actually render on a **800 × 1280 portrait** screen. `Pane.setImage` is the biggest slot in
+the library, but pane images are usually laid out as a side panel in landscape, and a
+postage stamp on the right of a portrait screen would make the whole idea pointless.
+
+**Cheap way to find out, in this order:** the internal test track is **not reviewed**, so a
+throwaway build with a chart bitmap answers the size and legibility question in the real
+car at zero risk of a rejection. Only if it looks good does the IU-1 argument need making.
 
 **Icons.** FMI publish the `smartsymbol` set openly in
 [fmidev/opendata-resources](https://github.com/fmidev/opendata-resources/tree/master/symbols).
