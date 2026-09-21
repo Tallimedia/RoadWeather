@@ -43,13 +43,25 @@ through `tallimedia.com` via a merchant of record, never Play Billing. But it do
 
 ## 2. Immediately after creation — two things that are easy to miss
 
-### Android Automotive OS form factor
+### Android Automotive OS form factor — added early, finished late
 
 **Test and release → Advanced settings → Form factors → + Add form factor → Android
-Automotive OS.** Accept the review policy. Without this the app cannot reach cars at all,
-and it is not part of the normal setup checklist.
+Automotive OS.** It is not on the dashboard setup checklist, so nothing prompts you and
+it is easy to miss entirely. Without it the app can never reach a car.
 
-Templated apps must ship on the **AAOS dedicated track**, not the mobile track.
+**But adding it is not completing it.** Observed in the Console 2026-09-21, the section
+has three steps and the third is padlocked:
+
+| | Step | State |
+|---|---|---|
+| 1 | Upload AAOS screenshots to the store listings | **Optional** — the Console says so explicitly |
+| 2 | Publish an AAOS app bundle or APK **to a test track** | Needs a built, signed AAB |
+| 3 | 🔒 Accept the review policy confirming the app meets AAOS quality rules | **Locked until the steps above are done** |
+
+**So Play Console setup cannot be finished before the app is built.** Plan for two
+passes: everything in §1 and §3–5 now, then come back for the form factor once there is
+a bundle on the internal test track. Templated apps must use the **AAOS dedicated
+track**, not the mobile track.
 
 ### EU trader status (DSA)
 
@@ -125,11 +137,17 @@ The same attribution has to appear **in the app**, not only in the listing.
 |---|---|
 | App icon | 512×512 PNG |
 | Feature graphic | 1024×500 |
-| **AAOS screenshots** | **≥2 portrait (800×1280)** and **≥2 landscape (1024×768)** |
+| **AAOS screenshots** | **Optional** per the Console. If supplied: ≥2 portrait (800×1280) and ≥2 landscape (1024×768) |
 
-Take them from the **generic** emulator AVDs — `FRW_api35_play_portrait` and
-`FRW_api35_play_landscape` are sized for exactly this. **Volvo-skinned screenshots are
-rejected**, so do not photograph the car.
+The icon and feature graphic are **generated, not hand-made** — run
+`python3 store/make_store_art.py`, which writes `store/icon-512.png` and
+`store/feature-1024x500.png` in the same dark-navy family as VolvoWatch and
+FIWeatherWatch. Deliberately no screenshots: Play wants real captures, and a drawing of
+a screen that does not exist yet is a lie that has to be redone.
+
+Capture screenshots from the **generic** emulator AVDs once the app runs —
+`FRW_api35_play_portrait` and `FRW_api35_play_landscape` are sized for exactly this.
+**Volvo-skinned screenshots are rejected**, so do not photograph the car.
 
 ---
 
