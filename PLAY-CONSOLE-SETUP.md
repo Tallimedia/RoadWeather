@@ -31,9 +31,10 @@ ever widens beyond Finland, everyone outside it sees Finnish. English as the def
 **fi-FI** and **sv-SE** added as translations gives Finns and Swedish speakers their own
 listing *and* a sensible fallback for everyone else. It costs nothing.
 
-### ⚠️ Free is effectively one-way
+### ⚠️ Free becomes one-way at first publish
 
-A paid app can be made free. **A free app cannot later be made paid.** This is not a
+Editable on the app's pricing page **right up until the app is published**. After that,
+a free app **can never be made paid** (a paid one can always be made free). This is not a
 problem here — the decision (D11) is that if the backend is ever charged for, it happens
 through `tallimedia.com` via a merchant of record, never Play Billing. But it does mean
 **Free** must be chosen deliberately rather than as a default.
