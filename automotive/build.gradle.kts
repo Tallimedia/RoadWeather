@@ -1,6 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+}
+
+// The upload key lives outside the repo and is never committed. Play App
+// Signing holds the real signing key; this one only proves uploads come from
+// us. If the properties file is absent the release build is simply unsigned,
+// which is better than failing the whole configuration phase on a machine that
+// has no business signing releases.
+val keystoreProps = Properties().apply {
+    val f = File(System.getProperty("user.home"), "Documents/keystores/firoadweather-keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
 }
 
 android {
@@ -28,9 +40,21 @@ android {
         buildConfigField("String", "API_BASE", "\"https://roadweather.tallimedia.com\"")
     }
 
+    signingConfigs {
+        if (keystoreProps.getProperty("storeFile") != null) {
+            create("upload") {
+                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("upload")
         }
     }
 
