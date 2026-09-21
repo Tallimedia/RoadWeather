@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Vägväder</string>
+
+    <string name="tab_road">Väg</string>
+    <string name="tab_weather">Väder</string>
+    <string name="tab_about">Om</string>
+
+    <string name="loading">Laddar…</string>
+    <string name="now">Nu</string>
+    <string name="outlook">Prognos</string>
+
+    <string name="road_surface">Vägyta</string>
+    <string name="air">Luft</string>
+    <string name="dew_point">Daggpunkt</string>
+    <string name="condition">Väglag</string>
+    <string name="unavailable">ej tillgängligt</string>
+
+    <string name="risk_high">Rimfrost eller is</string>
+    <string name="risk_moderate">Vägen kan vara isig</string>
+    <string name="risk_low">Vägytan nära noll</string>
+    <string name="risk_none">Ingen halkrisk</string>
+    <string name="risk_unknown">Halkrisk okänd — ingen vägsensor i närheten</string>
+
+    <string name="err_no_connection">Ingen anslutning</string>
+    <string name="err_outside_finland">Endast Finland — inga vägväderdata för denna plats</string>
+    <string name="err_no_location">Vägväder behöver din plats</string>
+    <string name="err_location_denied">Platsbehörighet behövs för att visa väglaget där du är</string>
+    <string name="grant">Tillåt</string>
+    <string name="retry">Försök igen</string>
+    <string name="stale">Senaste avläsning för %1$s sedan</string>
+
+    <string name="about_title">Finlands vägväder</string>
+    <string name="about_sources">Väder- och vägväderobservationer: Meteorologiska institutet, CC BY 4.0. Väglag: Källa: Fintraffic / digitraffic.fi, licens CC 4.0 BY.</string>
+    <string name="about_independent">Oberoende app, varken godkänd av eller knuten till någon av organisationerna.</string>
+    <string name="about_safety">Endast allmän information. Ersätter inte eget omdöme, myndigheternas varningar eller att köra efter väglaget.</string>
+    <string name="cond_dry">Torrt</string>
+    <string name="cond_moist">Fuktigt</string>
+    <string name="cond_wet">Vått</string>
+    <string name="cond_slushy">Snömodd</string>
+    <string name="cond_snowy">Snöigt</string>
+    <string name="cond_icy">Isigt</string>
+    <string name="cond_frosty">Rimfrost</string>
+    <string name="cond_normal">Normalt</string>
+    <string name="cond_poor">Dåligt</string>
+    <string name="cond_very_poor">Mycket dåligt</string>
+    <string name="no_road_station">· prognosen stöds inte av en vägstation</string>
+</resources>

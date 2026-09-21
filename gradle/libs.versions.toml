@@ -1,0 +1,17 @@
+[versions]
+agp = "8.7.3"
+kotlin = "2.0.21"
+# 1.7.0 is the first stable release carrying the CVE-2024-10382 fix.
+# Do not drop below it.
+carApp = "1.7.0"
+coreKtx = "1.13.1"
+coroutines = "1.8.1"
+
+[libraries]
+car-app-automotive = { group = "androidx.car.app", name = "app-automotive", version.ref = "carApp" }
+core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

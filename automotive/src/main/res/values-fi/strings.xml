@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Tiesää</string>
+
+    <string name="tab_road">Tie</string>
+    <string name="tab_weather">Sää</string>
+    <string name="tab_about">Tietoja</string>
+
+    <string name="loading">Ladataan…</string>
+    <string name="now">Nyt</string>
+    <string name="outlook">Ennuste</string>
+
+    <string name="road_surface">Tienpinta</string>
+    <string name="air">Ilma</string>
+    <string name="dew_point">Kastepiste</string>
+    <string name="condition">Keli</string>
+    <string name="unavailable">ei saatavilla</string>
+
+    <string name="risk_high">Kuuraa tai mustaa jäätä</string>
+    <string name="risk_moderate">Tie voi olla jäinen</string>
+    <string name="risk_low">Tienpinta lähellä nollaa</string>
+    <string name="risk_none">Ei liukkausriskiä</string>
+    <string name="risk_unknown">Liukkausriski tuntematon — ei tieanturia lähellä</string>
+
+    <string name="err_no_connection">Ei yhteyttä</string>
+    <string name="err_outside_finland">Vain Suomi — ei tiesäätietoja tälle sijainnille</string>
+    <string name="err_no_location">Tiesää tarvitsee sijaintisi</string>
+    <string name="err_location_denied">Sijaintilupa tarvitaan, jotta keli voidaan näyttää sijainnistasi</string>
+    <string name="grant">Salli</string>
+    <string name="retry">Yritä uudelleen</string>
+    <string name="stale">Viimeisin lukema %1$s sitten</string>
+
+    <string name="about_title">Suomen tiesää</string>
+    <string name="about_sources">Sää- ja tiesäähavainnot: Ilmatieteen laitos, CC BY 4.0. Keli: Lähde: Fintraffic / digitraffic.fi, lisenssi CC 4.0 BY.</string>
+    <string name="about_independent">Riippumaton sovellus, ei kummankaan organisaation hyväksymä tai tukema.</string>
+    <string name="about_safety">Vain yleiseksi tiedoksi. Ei korvaa omaa harkintaa, viranomaisten varoituksia tai kelin mukaan ajamista.</string>
+    <string name="cond_dry">Kuiva</string>
+    <string name="cond_moist">Kostea</string>
+    <string name="cond_wet">Märkä</string>
+    <string name="cond_slushy">Sohjoinen</string>
+    <string name="cond_snowy">Luminen</string>
+    <string name="cond_icy">Jäinen</string>
+    <string name="cond_frosty">Kuurainen</string>
+    <string name="cond_normal">Normaali</string>
+    <string name="cond_poor">Huono</string>
+    <string name="cond_very_poor">Erittäin huono</string>
+    <string name="no_road_station">· ennustetta ei tue tiesääasema</string>
+</resources>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Road conditions are about where the car is now. There is no useful
+         fallback to a fixed place in a moving vehicle (SPEC.md §5). -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Automotive only. This is also what tells Play the app is
+         automotive-exclusive, which it cannot know before it sees a bundle. -->
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true" />
+    <!-- The templates host renders every screen; without it there is no app. -->
+    <uses-feature
+        android:name="android.software.car.templates_host"
+        android:required="true" />
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+
+        <!-- Deliberately no android:theme here. Setting one on the automotive
+             module's application element breaks host rendering; Google calls
+             this out explicitly. -->
+
+        <meta-data
+            android:name="com.android.automotive"
+            android:resource="@xml/automotive_app_desc" />
+
+        <!-- Required, and the app refuses to start without it: the host reads
+             this before anything else and throws
+             "Min API level not declared in manifest" if it is absent.
+             6 is the level TabTemplate was introduced at, so declaring lower
+             would let the app launch on a host that cannot draw its only
+             screen. -->
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="6" />
+
+        <service
+            android:name=".FrwCarAppService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.WEATHER" />
+            </intent-filter>
+        </service>
+
+        <!-- CarAppActivity comes from the app-automotive artifact. It is the
+             launcher entry; the templates host draws everything inside it. -->
+        <activity
+            android:name="androidx.car.app.activity.CarAppActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Only honoured for trusted installs, which is why development
+                 runs on the non-Play emulator image. -->
+            <meta-data android:name="distractionOptimized" android:value="true" />
+        </activity>
+    </application>
+</manifest>

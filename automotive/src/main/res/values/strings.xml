@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Road Weather</string>
+
+    <string name="tab_road">Road</string>
+    <string name="tab_weather">Weather</string>
+    <string name="tab_about">About</string>
+
+    <string name="loading">Loading…</string>
+    <string name="now">Now</string>
+    <string name="outlook">Outlook</string>
+
+    <string name="road_surface">Road surface</string>
+    <string name="air">Air</string>
+    <string name="dew_point">Dew point</string>
+    <string name="condition">Condition</string>
+    <string name="unavailable">unavailable</string>
+
+    <string name="risk_high">Frost or black ice</string>
+    <string name="risk_moderate">Road may be icy</string>
+    <string name="risk_low">Road near freezing</string>
+    <string name="risk_none">No ice risk</string>
+    <string name="risk_unknown">Ice risk unknown — no road sensor nearby</string>
+
+    <string name="err_no_connection">No connection</string>
+    <string name="err_outside_finland">Finland only — no road data for this location</string>
+    <string name="err_no_location">Road conditions need your location</string>
+    <string name="err_location_denied">Location permission is needed to show conditions where you are</string>
+    <string name="grant">Grant</string>
+    <string name="retry">Retry</string>
+    <string name="stale">Last reading %1$s ago</string>
+
+    <string name="about_title">Finnish RoadWeather</string>
+    <string name="about_sources">Weather and road station data: Finnish Meteorological Institute, CC BY 4.0. Road conditions: Source: Fintraffic / digitraffic.fi, license CC 4.0 BY.</string>
+    <string name="about_independent">Independent app, not affiliated with or endorsed by either organisation.</string>
+    <string name="about_safety">General information only. Not a substitute for your own judgement, official warnings, or driving to the conditions.</string>
+    <string name="cond_dry">Dry</string>
+    <string name="cond_moist">Moist</string>
+    <string name="cond_wet">Wet</string>
+    <string name="cond_slushy">Slushy</string>
+    <string name="cond_snowy">Snowy</string>
+    <string name="cond_icy">Icy</string>
+    <string name="cond_frosty">Frosty</string>
+    <string name="cond_normal">Normal</string>
+    <string name="cond_poor">Poor</string>
+    <string name="cond_very_poor">Very poor</string>
+    <string name="no_road_station">· forecast not backed by a road station</string>
+</resources>
