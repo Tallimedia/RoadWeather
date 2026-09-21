@@ -100,23 +100,44 @@ Dashboard → **Policy → App content**. Answers for this app:
 | Health apps | **No** | |
 | Privacy policy URL | `https://roadweather.tallimedia.com/privacy` | Must exist and be reachable before submission |
 
-### Data safety — the one with a real trap
+### Data safety — declare the location, mark it ephemeral
 
-The app sends **coordinates** to the backend to find the nearest station. Under Google's
-definition, transmitting data off the device counts as **collection** — *unless* it
-qualifies for the **ephemeral processing** exemption: accessed in memory, used only to
-service the current request, and **not written to persistent storage**.
+**Corrected 2026-09-21.** An earlier revision of this guide said the answer was "no data
+collected". That was wrong in a way worth being precise about.
 
-That exemption is the honest answer here, **but it is only true if the backend does not
-log coordinates.** So it is an engineering requirement on `/v1/road`, not just a form
-answer:
+Google's definition: **"collect" means transmitting data off the device — including to
+your own backend.** So the app collects precise location. The *ephemeral processing*
+exemption does **not** mean you answer "no"; it means the data is declared in the form
+but **does not appear in the public Data safety display**.
 
-> **`/v1/road` must not write lat/lon to logs, access logs, metrics labels or the cache
-> key in any retrievable form.**
+Ephemeral processing is "accessing and using it while the data is only stored in memory
+and retained for no longer than necessary to service the specific request in real-time".
+Google's own worked example is a weather app transmitting location to fetch current
+conditions and discarding it — which is exactly this app.
 
-Get this right and the Data safety section is "no data collected", which matches the
-privacy policy. Get it wrong and the form contradicts reality — one of the more common
-causes of enforcement action.
+| Question | Answer |
+|---|---|
+| Collects or shares user data | **Yes** |
+| Data type | **Location → Precise location** |
+| Shared with third parties | **No** — FMI and Fintraffic are asked about a *place*, not a user |
+| **Processed ephemerally** | **Yes** |
+| Required or optional | **Required** — the app shows nothing without it |
+| Purpose | **App functionality** |
+| Encrypted in transit | **Yes** (HTTPS) |
+| Deletion requests supported | **No** — nothing is retained, so there is nothing to delete |
+
+**The ephemeral claim is only honest because of an engineering constraint**, and it has
+to stay that way:
+
+> **`/v1/road` must never write lat/lon to logs, access logs, metrics labels or a
+> retrievable cache key.**
+
+The backend enforces this with a log filter that redacts `lat`/`lon`/`latlon` from
+uvicorn's access log — added 2026-09-21 after finding that every coordinate query was
+being written to disk. Remove that filter and this declaration becomes false.
+
+`ROADWEATHER-PRIVACY.md` states the same thing in the same terms. Play cross-checks the
+policy against this form, so the two must not drift.
 
 ---
 
