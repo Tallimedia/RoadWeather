@@ -1,0 +1,33 @@
+# Owned by claude-docs, not this repo — see claude-docs/CLAUDE.md
+# ("Nested project code repos")
+RESEARCH.md
+
+# Android / Gradle
+*.iml
+.gradle/
+local.properties
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+release/
+
+# Android Studio / IntelliJ
+.idea/
+*.hprof
+
+# Signing — never commit these
+*.jks
+*.keystore
+keystore.properties
+
+# Local config / secrets
+.env
+*.env
+
+# OS
+.DS_Store
