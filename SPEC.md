@@ -155,7 +155,57 @@ on it (`PLAY-CONSOLE-SETUP.md` §3).
 
 ---
 
-## 9. Explicitly out of v1
+## 9. v1.1 — the Weather tab, properly
+
+Requested by Nico 2026-09-22. **Not v1.** Recorded here with the data verified so the
+next build is a build, not another research pass.
+
+The v1 Weather tab is deliberately thin — a temperature, a wind line and five forecast
+rows in plain text. v1.1 makes it a weather page worth opening on its own:
+
+| Wanted | Source | Status |
+|---|---|---|
+| Current temperature | `/v1/observations` `temperature` | Already served |
+| Wind | `windspeedms`, `windgust`, `windcompass8` | Already served |
+| **Rain probability** | `pop` | **Verified working, not yet in `/v1/forecast`** |
+| Rain amount | `precipitation1h` | Already served |
+| **Weather icon** | `smartsymbol` + FMI's open icon set | Needs drawables |
+| Next few hours | `/v1/forecast` points | Already served |
+
+**`pop` checked live 2026-09-22** against Helsinki over five days: range 0–68.4 %, and it
+tracks the symbol and the amount sensibly — 68 % with overcast and 0.0 mm, 56 % with
+showers and 0.4 mm. So probability and amount say genuinely different things and both
+earn their place. Thunderstorm probability (`probabilitythunderstorm`) also resolves, if
+it ever becomes interesting.
+
+**Backend change:** add `pop` to the `/v1/forecast` parameter list. That is the whole
+backend cost.
+
+**Icons.** FMI publish the `smartsymbol` set openly in
+[fmidev/opendata-resources](https://github.com/fmidev/opendata-resources/tree/master/symbols).
+Codes run 1–107 with **night variants at +100** — confirmed again in the same pull, where
+`104` and `106` came back for after-dark rows. They do not need one drawable each: the
+107 codes collapse to roughly fifteen distinct conditions, and a `when` mapping to a small
+vector set is far less work and far more legible on a car screen than 107 bitmaps.
+
+Quality rule **IU-1** forbids images in car apps *except* "a single static image for
+content context", and names a weather icon as the example — so this is explicitly allowed
+rather than merely tolerated.
+
+### One expectation to set now
+
+**"Graphical" cannot mean a chart.** The Car App Library gives no drawing canvas: the only
+template with a `Surface` is `MapWithContentTemplate`, which is for maps and drags in the
+map-specific quality rules (WE-2, WE-5, MR-1). A temperature curve or a rain graph is not
+available to a templated app at any effort level.
+
+What *is* available: an icon per row, a headline value, and up to six rows of structured
+text per list. So v1.1 looks like a clean icon-led list, not like a phone weather app.
+Worth agreeing before it is built rather than after.
+
+---
+
+## 10. Explicitly out of v1
 
 Named so they do not creep in, and so the store listing does not promise them:
 
