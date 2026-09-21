@@ -84,6 +84,12 @@ backend is ever monetised, this needs revisiting first — see D11.
 
 ## 3. App content declarations
 
+**Status 2026-09-21/22: this whole section is complete.** Privacy policy URL, app access,
+ads, content rating, target audience, health and Data safety are all answered and saved.
+Kept below as the record of *what* was answered and why, since Play cross-checks these
+against the privacy policy and against each other.
+
+
 Dashboard → **Policy → App content**. Answers for this app:
 
 | Declaration | Answer | Why |
