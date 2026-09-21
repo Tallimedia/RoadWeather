@@ -60,8 +60,16 @@ has three steps and the third is padlocked:
 
 **So Play Console setup cannot be finished before the app is built.** Plan for two
 passes: everything in §1 and §3–5 now, then come back for the form factor once there is
-a bundle on the internal test track. Templated apps must use the **AAOS dedicated
-track**, not the mobile track.
+a bundle on the internal test track.
+
+When the section asks how to manage AAOS releases, choose **"Käytä erillistä
+julkaisukanavaa: Android Automotive OS"** — a **separate release track**, not the mobile
+one. This is required, not preference: only *parked* apps may ride the mobile track,
+while **templated apps built on the Car App Library must use the AAOS dedicated track**.
+It is also the only sensible answer here — there is no mobile app, and the bundle will
+declare `android.hardware.type.automotive` as `required="true"`, so it cannot install on
+a phone. These are the tracks the Publishing API addresses as `automotive:production`,
+`automotive:beta` and `automotive:qa`.
 
 ### EU trader status (DSA)
 
