@@ -203,3 +203,47 @@ Capture screenshots from the **generic** emulator AVDs once the app runs —
 - **Do not enrol in anything paid.** Free, and staying that way.
 - The **upload keystore** must exist and be backed up somewhere that outlives the laptop
   before the first upload.
+
+---
+
+## 7. Getting the beta into the actual car
+
+**There is no beta-testing setting on the Volvo screen.** Nothing is enabled in the car —
+the app simply appears in the car's Play Store once the account is on the tester list.
+Looking for a toggle on the centre display is a dead end, so here is the real sequence.
+
+### In Play Console, once
+
+1. **Testing → Internal testing → Testers.** Create an email list and add the Google
+   account(s). This must be the **same account that is signed into the car**, not a
+   developer-only address.
+2. Same page: **copy the shareable opt-in link.** Internal testing is capped at 100
+   testers, which is ample for a handful of XC60 owners.
+3. Confirm the release is actually **live on the internal track**, not a draft.
+
+### Once per tester, in a browser
+
+4. Open the opt-in link **signed in as the car's Google account** and accept. Doing this
+   while signed in as some other account is the usual reason the app never shows up.
+
+### In the car
+
+5. The XC60 must be signed into that same Google account — it hangs off the driver
+   profile, not off a separate app-store login. *(Exact Volvo menu label unverified; it
+   has not been done on this car yet.)*
+6. Open **Google Play on the centre display** and search for the app by name, or find it
+   in the Play library. Allow a little time after the release goes live for it to
+   propagate.
+
+### Things that will waste an evening if not known
+
+- **It will never appear on a phone.** The manifest declares
+  `android.hardware.type.automotive` as required, so the phone Play Store correctly
+  treats the device as incompatible. The car is the only place it can install.
+- **Sideloading is not an option, at all.** Production Volvos block developer mode, and
+  Android Auto's developer mode explicitly does **not** cover apps built with the Car App
+  Library. Internal App Sharing or the internal test track are the only routes
+  (`developer.android.com/training/cars/testing`).
+- **Country targeting does not gate internal testers**, so Finland-only is not a blocker
+  here — but the **EU trader status declaration** is still outstanding and does gate
+  wider release.
