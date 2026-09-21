@@ -11,7 +11,16 @@ and AAOS quality review fails on presentation, not on data.
 
 ## 1. Shape
 
-A **Tab template** with three tabs, in the order Road, Weather, About.
+A **Tab template** with three tabs, in the order Road, Weather, Warnings.
+
+**About is not a tab** (Nico, 2026-09-22). Three tabs is the budget worth spending, and
+attribution does not deserve one of them. Verified against the AAR: the tab strip's own
+header slot cannot hold it — `TabTemplate.setHeaderAction` validates against
+`ACTIONS_CONSTRAINTS_TABS`, which is `ACTIONS_CONSTRAINTS_HEADER` plus
+`addRequiredActionType(65538)`, and `Action.TYPE_APP_ICON == 65538`. That slot is the app
+icon or nothing. The **ActionStrip on each tab's own `ListTemplate`** takes custom actions
+with click listeners (`ACTIONS_CONSTRAINTS_SIMPLE`), so an **ⓘ** there pushes the About
+screen. The licences are still satisfied: the credit is in the app, one tap away.
 
 **The app opens on Weather** (Nico, 2026-09-22): it is what you want when you get in the
 car, and since v1.1 it carries the road reading beside the air one, it is the overview.
@@ -23,7 +32,8 @@ independently and cheaply.
 |---|---|---|
 | **Road** | List | Surface temperature, ice risk, condition, 0–12 h outlook |
 | **Weather** | List | Weather and road now, then twelve hours ahead — **the landing tab** |
-| **About** | Message | Attribution, disclaimer, version |
+| **Warnings** | List | FMI land warnings, then road works and notices nearby |
+| *About* | Message | Reached by an **ⓘ** in the action strip, not by a tab |
 
 No map in v1 — that would pull in `MAP_TEMPLATES`, the Maps SDK and the map-specific
 quality rules (WE-2, WE-5, MR-1) for a forecast strip and a temperature readout that are
@@ -97,9 +107,9 @@ Forecast rows come from `points[]`. `smartsymboltext` gives a plain-language con
 
 ---
 
-## 4. About tab
+## 4. About screen
 
-A **MessageTemplate**, not a list. As four full-height Rows it dominated the screen for
+Reached by the **ⓘ** action, not a tab (§1). A **MessageTemplate**, not a list. As four full-height Rows it dominated the screen for
 content nobody reads twice (Nico, 2026-09-22); a MessageTemplate is one icon and one
 block of text, and still carries the attribution both licences oblige, **in the app** and
 not only in the store listing:
@@ -110,6 +120,43 @@ not only in the store listing:
 - The safety line: general information, not a substitute for judgement, official warnings
   or driving to the conditions.
 - App version and a link to `roadweather.tallimedia.com`.
+
+---
+
+## 4b. Warnings tab
+
+Added 2026-09-22 at Nico's suggestion, on `/v1/warnings`. The research behind the source
+choice is `RESEARCH.md` §5.6; the short version is that **FMI alone would show an empty
+tab**. Checked live that day, the CAP feed held six alerts and every one was marine, on a
+land-and-road-only app. Fintraffic's road works are what make the tab worth opening.
+
+```
+  Warnings
+  ─────────────────────
+  (only when one exists — severity-coloured, never a placeholder)
+  Road works and notices · within 25 km
+  2.5 km   Tie 45, Helsinki
+           One carriageway closed
+           Road work · until 30 Sep 2027
+  2.6 km   Tie 4, Helsinki
+           Multiple lanes closed
+  4.8 km   Tie 100 Hakamäentie
+           Road closed · detour
+```
+
+- **Alerts are matched by point-in-polygon, never by event name.** A driver is not inside
+  a sea-area polygon, so marine warnings filter themselves out without a keyword list that
+  would go stale — and **WE-1** wants location relevance rather than a national list.
+- **Notices are ranked by distance alone**, not by category. A closed lane 2 km away
+  matters more than an announcement 20 km off, whatever it is called. Default radius
+  25 km; beyond that it is not on the route in any useful sense.
+- **The restriction is the headline**, not the word "roadwork": `SPEED_LIMIT 50 km/h`,
+  `SINGLE_CARRIAGEWAY_CLOSED`, `ROAD_CLOSED · DETOUR`, `TRAFFIC_LIGHTS`. Fintraffic serve
+  these as an enum with quantities, so they translate cleanly into fi/sv/en.
+- **Empty is a designed state, and a real one.** Utsjoki returns zero of both. The tab
+  says so plainly rather than showing a spinner or an encouraging placeholder.
+- **IN-1 does not apply.** It governs notifications, not display. Pushing an alert at the
+  driver stays out of scope; showing one on a tab is unconstrained.
 
 ---
 
@@ -154,7 +201,8 @@ Single host, `roadweather.tallimedia.com`, same service as the watch backend.
 |---|---|
 | `GET /v1/road?lat&lon` | Road tab — `surface`, `station`, `section.outlook`, `ice_risk` |
 | `GET /v1/observations?lat&lon` | Weather tab, current |
-| `GET /v1/forecast?lat&lon&hours` | Weather tab, forecast strip |
+| `GET /v1/forecast?lat&lon&hours&step` | Weather tab, forecast strip |
+| `GET /v1/warnings?lat&lon&lang&radius_km` | Warnings tab — `warnings`, `road_notices` |
 
 All timestamps are `epochtime`, UTC. The raw FMI `time` field is **local** and is never
 used. Coordinates are never logged server-side — the Play Data safety declaration depends
