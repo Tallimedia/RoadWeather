@@ -1,0 +1,8 @@
+First internal build.
+
+Road surface temperature and ice risk from the nearest road weather station, road
+condition and a 0-12 h outlook for your road section, and current weather and forecast
+from the Finnish Meteorological Institute.
+
+Finland only. Please check: does the road reading match where you actually are, and is
+the station distance plausible?
