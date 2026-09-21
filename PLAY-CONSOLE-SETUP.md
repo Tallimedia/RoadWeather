@@ -91,7 +91,7 @@ Dashboard → **Policy → App content**. Answers for this app:
 | App access | **All functionality available without restrictions** | No accounts, no login, no paywall |
 | Ads | **No ads** | And keep it that way — AD-1 forbids text ads in car apps |
 | Content rating | Complete the questionnaire | No user content, no violence, no purchases → lowest rating |
-| Target audience | **18+ only** | Deliberate: selecting any under-18 group pulls the app into the Families programme and its extra requirements, for no benefit |
+| Target audience | **Anything from 13 upward — just not under 13** | Corrected 2026-09-21. Only the under-13 brackets trigger Families Policy Requirements (certified ad SDKs, neutral age screen, separate review). 13–15, 16–17 and 18+ carry no extra obligations, so there is no reason to exclude teenagers. Note 18+ does **not** block installation on its own — that is a separate opt-in feature, *Restrict Minor Access*. |
 | News app | **No** | |
 | COVID-19 contact tracing | **No** | |
 | Data safety | See below — **read this one properly** | |
