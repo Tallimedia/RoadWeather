@@ -11,14 +11,19 @@ and AAOS quality review fails on presentation, not on data.
 
 ## 1. Shape
 
-A **Tab template** with three tabs. Road leads: it is the differentiator, and the only
-thing here that no other weather app in the car has.
+A **Tab template** with three tabs, in the order Road, Weather, About.
+
+**The app opens on Weather** (Nico, 2026-09-22): it is what you want when you get in the
+car, and since v1.1 it carries the road reading beside the air one, it is the overview.
+Road stays first in the tab strip and becomes the detail view behind it — one constant in
+`MainScreen` decides the landing tab, so the order and the default can be changed
+independently and cheaply.
 
 | Tab | Template | Purpose |
 |---|---|---|
-| **Road** | Pane + List | Surface temperature, ice risk, condition, 0–12 h outlook |
-| **Weather** | Pane + List | Current conditions and the short forecast, from FMI |
-| **About** | Pane | Attribution, disclaimer, version |
+| **Road** | List | Surface temperature, ice risk, condition, 0–12 h outlook |
+| **Weather** | List | Weather and road now, then twelve hours ahead — **the landing tab** |
+| **About** | Message | Attribution, disclaimer, version |
 
 No map in v1 — that would pull in `MAP_TEMPLATES`, the Maps SDK and the map-specific
 quality rules (WE-2, WE-5, MR-1) for a forecast strip and a temperature readout that are
@@ -54,6 +59,19 @@ the surface number leads and air temperature is secondary.
   it is not `SUCCESSFUL`. Digitraffic is candid about whether a road station backed the
   forecast; the app passes that candour on rather than hiding it.
 - **Section name** as the List header, e.g. *Kt 51: Helsinki – Kehä III*.
+- **Every number says what it is** (Nico, 2026-09-22 — the data was right but unexplained).
+  A Row has only two secondary lines, so the explanation that does not fit a row goes in
+  the section header: *"Road surface now — measured on the road, not the air"* glosses the
+  whole group at no cost in rows. Two raw numbers were replaced by the derived ones the
+  backend already serves from Digitraffic and which a driver can act on:
+
+  | Was | Is |
+  |---|---|
+  | `Dew point -1.0 °C` | `0.6 °C above the dew point — frost forms at 0`, and below zero it flips to *"0.1 °C below the dew point — moisture condensing on the surface"* and turns amber |
+  | — | `Freezes at -0.1 °C` with the salt load beneath it, so the reader sees why it is not zero |
+  | `· reliability NO_DATA_FROM_ROADSTATION` | `Estimated — no sensor on this stretch` |
+  | `0h` / `2h` | `Now` / `In 2 h` |
+  | `kt51_Hki_Lapinlahti` | `Kt 51 Hki Lapinlahti`, labelled *Nearest road sensor* |
 
 ---
 
@@ -81,8 +99,10 @@ Forecast rows come from `points[]`. `smartsymboltext` gives a plain-language con
 
 ## 4. About tab
 
-Carries the attribution both licences oblige, **in the app** and not only in the store
-listing:
+A **MessageTemplate**, not a list. As four full-height Rows it dominated the screen for
+content nobody reads twice (Nico, 2026-09-22); a MessageTemplate is one icon and one
+block of text, and still carries the attribution both licences oblige, **in the app** and
+not only in the store listing:
 
 - Finnish Meteorological Institute — CC BY 4.0
 - `Source: Fintraffic / digitraffic.fi, license CC 4.0 BY`
@@ -157,53 +177,92 @@ on it (`PLAY-CONSOLE-SETUP.md` §3).
 
 ## 9. v1.1 — the Weather tab, properly
 
-Requested by Nico 2026-09-22. **Not v1.** Recorded here with the data verified so the
-next build is a build, not another research pass.
+Requested by Nico 2026-09-22, refined against a live mockup the same day. **Not v1.**
+The layout below is what the preview at `roadweather.tallimedia.com/demo` renders from
+live data; it is a build contract, not a sketch.
 
-The v1 Weather tab is deliberately thin — a temperature, a wind line and five forecast
-rows in plain text. v1.1 makes it a weather page worth opening on its own:
+### What the tab shows
+
+```
+  Now, where you are                     ← section header
+  ☾  10.7 °C                             ← FMI observation + smartsymbol
+     Clear · rain 0 %
+     Wind N 2.6 m/s · gust 4.8
+  ▦  Road 10.2 °C                        ← the same place, from /v1/road
+     Dry · no ice risk
+     Kt 51 Hki Lapinlahti · 2.2 km
+  Next 12 hours
+  ☁  06.00   9 °C
+     Clear
+     N 4 m/s · rain 0 %
+  ... four rows, three-hour steps
+```
+
+Weather now and road now sit together, which is the point: the driver asked one question
+and both halves of the answer are on the first screen. The Road tab stops being somewhere
+you must go and becomes the detail behind a summary.
 
 | Wanted | Source | Status |
 |---|---|---|
-| Current temperature | `/v1/observations` `temperature` | Already served |
-| Wind | `windspeedms`, `windgust`, `windcompass8` | Already served |
-| **Rain probability** | `pop` | **Verified working, not yet in `/v1/forecast`** |
-| Rain amount | `precipitation1h` | Already served |
-| **Weather icon** | `smartsymbol` + FMI's open icon set | Needs drawables |
-| Next few hours | `/v1/forecast` points | Already served |
+| Current temperature | `/v1/observations` `temperature` | Served |
+| Wind | `windspeedms`, `windgust`, `windcompass8` | Served — **optional**, Utsjoki reports none, so the line is omitted rather than filled with dashes |
+| Rain probability | `pop` | **Added to `/v1/forecast` 2026-09-22** |
+| Rain amount | `precipitation1h` | Served — appended only when non-zero |
+| Road temperature, surface state, ice risk | `/v1/road` | Served |
+| Weather icon | `smartsymbol` + FMI's open icon set | Needs drawables |
+| Next 12 hours | `/v1/forecast?hours=21&step=180` | Served — `points[0]` is the current hour, so the outlook starts at `[1]` |
 
-**`pop` checked live 2026-09-22** against Helsinki over five days: range 0–68.4 %, and it
-tracks the symbol and the amount sensibly — 68 % with overcast and 0.0 mm, 56 % with
-showers and 0.4 mm. So probability and amount say genuinely different things and both
-earn their place. Thunderstorm probability (`probabilitythunderstorm`) also resolves, if
-it ever becomes interesting.
+### The template budget, measured rather than assumed
 
-**Backend change:** add `pop` to the `/v1/forecast` parameter list. That is the whole
-backend cost.
+Read off the shipped `androidx.car.app:app-automotive:1.7.0` AAR, because this is what
+decides whether a layout is a design or a wish:
 
-**Icons.** FMI publish the `smartsymbol` set openly in
-[fmidev/opendata-resources](https://github.com/fmidev/opendata-resources/tree/master/symbols).
-Codes run 1–107 with **night variants at +100** — confirmed again in the same pull, where
-`104` and `106` came back for after-dark rows. They do not need one drawable each: the
-107 codes collapse to roughly fifteen distinct conditions, and a `when` mapping to a small
-vector set is far less work and far more legible on a car screen than 107 bitmaps.
+| | |
+|---|---|
+| A tab holds | exactly **one** template (`TabContents`) |
+| `Row` | optional icon + title + **2** secondary lines (`ROW_CONSTRAINTS_SIMPLE`, `maxTextLinesPerRow = 2`) |
+| `GridItem` | image + title + **1** text line. No second line exists |
+| Safe item budget | **6** while moving |
+| `TabTemplate` | `@RequiresCarApi(6)` — which is why `minCarApiLevel` is 6 |
+| `SectionedItemTemplate`, `RowSection`, `GridSection` | present in 1.7.0 but **`@ExperimentalCarApi`** |
 
-Quality rule **IU-1** forbids images in car apps *except* "a single static image for
-content context", and names a weather icon as the example — so this is explicitly allowed
-rather than merely tolerated.
+**The consequence, and it killed the first mockup.** Rows and grid tiles cannot share a
+tab on the stable API — mixing them needs `SectionedItemTemplate`, which is still
+experimental. The first preview drew two rows above a six-tile forecast grid. It looked
+right and was not buildable.
 
-### One expectation to set now
+### The one open choice: "Now" as rows or as tiles
+
+Both are live in the preview behind a switch, because the trade-off is not obvious on
+paper:
+
+| | **Stacked rows** (recommended) | **Side-by-side tiles** |
+|---|---|---|
+| Template | `ListTemplate` — stable | `SectionedItemTemplate` — experimental |
+| Literally side by side | No | Yes |
+| Wind on the first screen | Yes | **No** — a `GridItem` has one text line, and it is spent on the condition |
+| Station provenance | Yes | No |
+| Forecast rows below | 4 (12 h) | 6 (18 h) |
+
+Rows win on information per screen and on not shipping an experimental API to a car.
+Tiles win only on the literal arrangement. **Nico to pick from the preview.**
+
+### One expectation to set
 
 **"Graphical" cannot mean a chart.** The Car App Library gives no drawing canvas: the only
 template with a `Surface` is `MapWithContentTemplate`, which is for maps and drags in the
 map-specific quality rules (WE-2, WE-5, MR-1). A temperature curve or a rain graph is not
 available to a templated app at any effort level.
 
-What *is* available: an icon per row, a headline value, and up to six rows of structured
-text per list. So v1.1 looks like a clean icon-led list, not like a phone weather app.
-Worth agreeing before it is built rather than after.
+**Icons.** FMI publish the `smartsymbol` set openly in
+[fmidev/opendata-resources](https://github.com/fmidev/opendata-resources/tree/master/symbols).
+Codes run 1–107 with **night variants at +100**. They do not need one drawable each: the
+107 codes collapse to roughly fifteen distinct conditions, and a `when` mapping to a small
+vector set is far less work and far more legible on a car screen than 107 bitmaps.
 
----
+Quality rule **IU-1** forbids images in car apps *except* "a single static image for
+content context", and names a weather icon as the example — so this is explicitly allowed
+rather than merely tolerated.
 
 ## 10. Explicitly out of v1
 
