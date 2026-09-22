@@ -348,5 +348,13 @@ Named so they do not creep in, and so the store listing does not promise them:
 - FMI warnings and notifications (IN-1 makes notifying a deliberate design act)
 - Lightning proximity (`RESEARCH.md` §5.4 — gated on the latency spike)
 - Any map
-- Settings of any kind — AAOS restricts app-owned activities to parked flows
+- **Settings — by choice, not because they are forbidden.** An earlier draft of this line
+  said AAOS restricts app-owned activities to parked flows, implying settings were
+  unavailable. That was misleading: `RESEARCH.md` §1 records that setup, settings and
+  sign-in are the three *explicit exceptions* to that restriction, and Foreca's car app
+  ships a settings screen (units, feedback address, terms, software licences) in this very
+  Volvo. They are excluded because a Finland-only app has nothing worth configuring —
+  °C, m/s and mm each have exactly one sensible answer here — not because the platform
+  says no. **WE-4** does forbid one specific setting: forecast intervals must not be
+  customisable via templates.
 - Weather icons — text first, `smartsymbol` graphics in v1.1

@@ -144,3 +144,46 @@ Worth recording, because these were the things most likely to break:
 - The tab strip, the Finnish locale and the attribution screen all behaved.
 - `minCarApiLevel 6` and `TabTemplate` are accepted by the real Google Automotive App
   Host, not just by the emulator.
+
+---
+
+## Benchmark: Foreca, in the same car
+
+Photographed alongside, 2026-09-22. Foreca is the incumbent worth measuring against — a
+Finnish forecasting company, already installed, and the app a Finnish XC60 driver would
+otherwise reach for.
+
+### It corrects our spec
+
+**Foreca has a settings screen** — *Lämpötila / Tuulen nopeus / Sade* (units), *Palaute*
+with a support address, *Käyttöehdot ja tietoja*, *Ohjelmistolisenssit* — reached by a
+back-chevron header, so a pushed screen rather than a separate app.
+
+`SPEC.md` §10 said settings were out because "AAOS restricts app-owned activities to
+parked flows". That was **misleading and is now fixed**: `RESEARCH.md` §1 already recorded
+that setup, **settings** and sign-in are the three explicit *exceptions* to that
+restriction. Settings were always available. A shipping competitor using them settles it.
+
+They stay out of v1 anyway, but for the honest reason: a Finland-only app has one sensible
+answer for each unit. **WE-4** separately forbids making forecast intervals configurable.
+
+### What Foreca does that we should copy
+
+- **A feedback address in the app.** `androidsupport@foreca.com`, one row in settings.
+  Trivial, and during a closed beta it is the difference between a tester telling you
+  something and not bothering.
+- **Terms and software licences as pushed screens**, not a tab. Exactly the ⓘ → About
+  structure `SPEC.md` §1 now specifies, arrived at independently. Good sign.
+
+### What we do that Foreca cannot
+
+Worth stating plainly, because it is the whole premise and the benchmark confirms it:
+Foreca has no road surface temperature, no ice risk, no Fintraffic road condition, no
+road works. It is a very good **weather** app in a car. The gap it leaves is the road.
+
+### Still to compare on a second look
+
+- How Foreca handles **position while driving** — whether it re-resolves, which is
+  defect 1 above and the thing most worth stealing if they have solved it well.
+- Whether its forecast rows carry more per row than ours, and how it fills the same
+  six-row budget.
