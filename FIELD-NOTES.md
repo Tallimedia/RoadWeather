@@ -203,3 +203,91 @@ road works. It is a very good **weather** app in a car. The gap it leaves is the
   defect 1 above and the thing most worth stealing if they have solved it well.
 - Whether its forecast rows carry more per row than ours, and how it fills the same
   six-row budget.
+
+---
+
+# Second run — v0.2.0, 2026-09-22 afternoon
+
+## What the fixes did
+
+All five defects from the morning are gone, confirmed on screen:
+
+- **Position follows the car.** 14:47 `Kt 50 Vantaa Suutarila Länsi` / *Kt 45: Kehä I –
+  Tuusula*; 14:51 `Kt 50 Vantaa Vantaankoski` / *Kt 50: Hämeenlinnanväylä – Porvoonväylä*.
+  Different station and different section four minutes apart — the 2 km threshold works.
+- **Finnish throughout**: *selkeää*, *enimmäkseen selkeää*, *Kuiva*.
+- **Station names readable**: `Kt 50 Vantaa Vantaankoski`.
+- **No fault text** in the condition row.
+
+## 7. New, and introduced by v0.2.0: the template quota
+
+Two symptoms, and the evidence points at one cause.
+
+**The error.** After several minutes of driving, the Tie tab was replaced by a warning
+triangle and *"Tätä tehtävää ei voi suorittaa ajon aikana"*. The tab strip stayed; only
+the content was refused.
+
+**The left shift.** In every v0.2.0 screenshot the content sits too far left, with
+fragments of another view at the edge — `/Nyt`, `>Kt 45`. That is what a **push
+transition caught mid-slide** looks like, and it appears on the Tie and Sää tabs alike.
+
+### Why they are the same thing
+
+From the template restrictions, quoted:
+
+> The host limits the number of templates to display for a given task to a maximum of
+> **five** … In general, if an app pushes a new template that is of the same type and
+> contains **the same main content** as the previous template, the new template is not
+> counted against the quota.
+
+v0.1.0 produced exactly one template in its life, so it could never hit this. **v0.2.0
+reloads as the car moves, and every reload changes the main content** — new station name,
+new temperatures, new row titles. Each one is therefore a *new template step*, not a
+refresh: hence the slide animation, and hence running out.
+
+The quota resets only on an end-of-task template such as `NavigationTemplate`, on a
+launcher or notification intent, or partially when a `Screen` is popped. **None of those
+happen in this app.** It has one screen and never navigates.
+
+### The part that is not yet certain
+
+The documentation says an exhausted quota makes the host *"display an error message to the
+user before closing the app"*. The app did **not** close — the tab strip survived and only
+the content area was refused, and the message is the distraction-restriction wording
+rather than a quota one. So either AAOS's host behaves differently from the documented
+Android Auto behaviour, or something else refused that one template.
+
+**Questions that would settle it**, next time it happens:
+
+1. Did the other tabs still work, or was the whole app stuck?
+2. Did it clear when the car stopped, or only on relaunch?
+3. Roughly how many tab taps and how long into the drive?
+
+### Why the obvious fix does not work
+
+Refreshing less often only delays it. A 30-minute drive at any useful threshold still
+produces more than five content changes, and tab taps consume the same quota. **The
+refresh has to become an actual refresh.**
+
+That means the main content must stay the same across updates, which for a `ListTemplate`
+means a **stable row count and stable row titles** — only the secondary lines changing.
+Today the temperature *is* the row title, which guarantees a new template every time.
+
+### The design decision this forces
+
+`SPEC.md` §2 says the surface temperature is the largest element on the screen, and the
+row title is what makes it large. Making refreshes free means inverting that:
+
+```
+  before                          after
+  16,9 °C            ← title      Tienpinta          ← title, never changes
+  Ei liukkausriskiä               16,9 °C · ei liukkausriskiä
+  Tienpinta
+```
+
+The number stops being the headline. That is a real loss and it is **Nico's call**, not a
+detail to decide while fixing a bug. The alternative is to accept the quota and refresh
+only when the app is brought to the foreground — correct, cheap, and back to a position
+that goes stale mid-drive.
+
+Unresolved. Nothing built.
