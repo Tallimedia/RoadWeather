@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.0 — 2026-09-22
+
+- **The app no longer dies mid-drive.** The host allows five templates per task
+  and only counts a redraw as free when it is the same type with the same main
+  content. v0.2.0's reload swapped the content to a `MessageTemplate` while
+  loading and back again, spending two steps every 2 km — about five kilometres
+  before every tab stopped responding. A reload now keeps the previous reading
+  on screen, and the loading state is pushed only on a cold start.
+- **Nothing is pushed when the result would look the same.** A signature of the
+  rendered content decides whether to redraw at all.
+
 ## 0.2.0 — 2026-09-22
 
 First drive in the car produced five defects; this is all of them

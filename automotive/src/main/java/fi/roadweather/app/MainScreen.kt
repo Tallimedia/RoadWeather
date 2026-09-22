@@ -129,11 +129,36 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
      * @param known a fix already in hand, from the location stream. Avoids
      *   asking for a second one that would only repeat it.
      */
+    private val hasContent: Boolean
+        get() = road != null || observation != null
+
+    /**
+     * What the screen would draw, reduced to a string.
+     *
+     * The host counts a new template against a five-per-task quota unless it
+     * is the same type with the same main content, and there is no way to ask
+     * whether a given change qualifies. So the app stops guessing and simply
+     * does not push a template when the visible result would be identical —
+     * a refetch on the far side of a village usually returns the same station
+     * and the same rounded numbers.
+     */
+    private fun signature(): String = listOf(
+        activeTab, permissionDenied, outsideCoverage, failed,
+        road?.surface?.station, road?.surface?.roadTempC, road?.risk,
+        road?.station?.condition, road?.station?.conditionFault,
+        road?.section?.description, road?.section?.outlook?.size,
+        observation?.station, observation?.tempC, forecast.firstOrNull()?.epoch,
+    ).joinToString("|")
+
+    private var rendered: String? = null
+
     private fun load(known: android.location.Location? = null) {
         loading = true
         failed = false
         outsideCoverage = false
-        invalidate()
+        // A reload keeps the previous reading visible; only a cold start has
+        // nothing to show and needs the loading state pushed.
+        if (!hasContent) invalidate()
         lifecycleScope.launch {
             val fix = known ?: Locator.fix(carContext)
             if (fix == null) {
@@ -151,7 +176,11 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
                 failed = true
             }
             loading = false
-            invalidate()
+            val now = signature()
+            if (now != rendered) {
+                rendered = now
+                invalidate()
+            }
         }
     }
 
@@ -159,6 +188,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         val builder = TabTemplate.Builder(object : TabTemplate.TabCallback {
             override fun onTabSelected(tabContentId: String) {
                 activeTab = tabContentId
+                rendered = signature()
                 invalidate()
             }
         })
@@ -184,7 +214,11 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
     private fun content(): Template = when {
         activeTab == TAB_ABOUT -> aboutTemplate()
         permissionDenied -> message(R.string.err_location_denied, R.string.grant) { requestLocation() }
-        loading -> message(R.string.loading, null, null)
+        // Only when there is nothing yet. On a reload the previous reading
+        // stays on screen: swapping to a MessageTemplate and back spends two
+        // steps of a five-template quota every 2 km, which is what took the
+        // whole app out mid-drive (FIELD-NOTES.md §7).
+        loading && !hasContent -> message(R.string.loading, null, null)
         outsideCoverage -> message(R.string.err_outside_finland, R.string.retry) { load() }
         failed -> message(R.string.err_no_connection, R.string.retry) { load() }
         activeTab == TAB_WEATHER -> weatherTemplate()

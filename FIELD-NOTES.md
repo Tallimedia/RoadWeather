@@ -290,4 +290,42 @@ detail to decide while fixing a bug. The alternative is to accept the quota and 
 only when the app is brought to the foreground — correct, cheap, and back to a position
 that goes stale mid-drive.
 
-Unresolved. Nothing built.
+### Resolved — and the design does not have to change
+
+Nico, on the same drive: **no tab worked after the error, and it came back to normal
+after about ten minutes.**
+
+"No tab worked" is what settles it. A distraction restriction refuses one template; a
+spent quota refuses *every* new template, which is exactly a dead tab strip. The recovery
+fits too — the quota resets on a launcher intent, so leaving the app and returning
+restores it, and ten minutes of driving is ample for that to happen by accident.
+
+That pointed at the code, where the cause turned out to be narrower and much stupider
+than "the data changes":
+
+```kotlin
+loading -> message(R.string.loading, null, null)   // a MessageTemplate
+```
+
+**Every reload swapped the inner template to a `MessageTemplate` and back**, so one
+position update cost *two* steps of a five-step quota. Two and a half reloads — about
+five kilometres — and the app was finished. v0.1.0 never noticed because it loaded once
+at startup and then never again.
+
+Fixed in **v0.3.0**, and none of it costs the design:
+
+- **A reload keeps the previous reading on screen.** The loading state is now pushed only
+  on a cold start, when there is genuinely nothing to show. One template per update
+  instead of three.
+- **The app pushes nothing when the result would look the same.** It compares a signature
+  of what would be drawn — station, rounded values, risk, section, forecast start — and
+  skips `invalidate()` when it matches. A refetch on the far side of a village usually
+  returns the same station and the same numbers.
+
+The row-title inversion from the previous section is **not needed** and is not being
+done. The surface temperature stays the headline (`SPEC.md` §2 stands).
+
+**Still unverified:** whether the remaining one-template-per-genuine-change rate stays
+inside the quota over a long drive with tab switching. If v0.3.0 still dies, the title
+change is the next lever — but it should not come to that, since a commute produces only
+a handful of genuinely different readings.

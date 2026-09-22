@@ -1,0 +1,35 @@
+<fi-FI>
+Korjaus: sovellus lakkasi toimimasta kesken ajon.
+
+Päivittäessään sijaintia sovellus piirsi näytön kokonaan uudelleen, ja auton
+järjestelmä salli sitä vain rajallisesti. Lopulta mikään välilehti ei enää
+toiminut.
+
+Nyt sovellus piirtää näkymän uudelleen vain kun tiedot oikeasti muuttuvat.
+Edellinen lukema jää näkyviin päivityksen ajaksi.
+
+Testaa: toimiiko sovellus koko matkan ajan, myös välilehtiä vaihdellessa?
+</fi-FI>
+<sv-SE>
+Korrigering: appen slutade fungera under körning.
+
+När positionen uppdaterades ritades hela vyn om, och bilens system tillåter
+det bara ett begränsat antal gånger. Till slut fungerade ingen flik alls.
+
+Nu ritas vyn om endast när uppgifterna faktiskt ändras. Föregående avläsning
+blir kvar på skärmen under uppdateringen.
+
+Testa: fungerar appen hela resan, även när du byter flik?
+</sv-SE>
+<en-US>
+Fix: the app stopped responding mid-drive.
+
+Updating the position redrew the whole screen, and the car's system only
+allows that a limited number of times. Eventually no tab worked at all.
+
+The view is now redrawn only when the data actually changes, and the previous
+reading stays on screen while an update is fetched.
+
+Worth testing: does the app keep working for a whole journey, including tab
+switches?
+</en-US>
