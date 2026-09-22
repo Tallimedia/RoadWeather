@@ -1,0 +1,30 @@
+<fi-FI>
+Korjauksia ensimmäisen ajon jälkeen.
+
+• Sijainti päivittyy nyt ajaessa. Aiemmin sovellus näytti saman tien koko matkan.
+• Sääennusteen tekstit ovat nyt suomeksi.
+• Rikkinäinen tiesääasema ei enää näy kelitietona, vaan lukee "ei saatavilla".
+• Asemien nimet luettavassa muodossa: Vt 3 Helsinki Pirkkola.
+
+Testaa erityisesti: vaihtuvatko tie ja asema, kun ajat paikasta toiseen?
+</fi-FI>
+<sv-SE>
+Korrigeringar efter den första körningen.
+
+• Positionen uppdateras nu under färd. Tidigare visade appen samma väg hela resan.
+• Prognostexterna följer nu bilens språk.
+• En trasig vägväderstation visas inte längre som väglag, utan som "ej tillgänglig".
+• Stationsnamn i läsbar form: Vt 3 Helsinki Pirkkola.
+
+Testa särskilt: byts vägen och stationen när du kör vidare?
+</sv-SE>
+<en-US>
+Fixes from the first drive.
+
+• The position now follows the car. Before, the app showed the same road for a whole journey.
+• Forecast text follows the car's language.
+• A faulty roadside sensor no longer appears as a road condition — it now reads "unavailable".
+• Readable station names: Vt 3 Helsinki Pirkkola.
+
+Worth testing: do the road and station change as you drive?
+</en-US>
