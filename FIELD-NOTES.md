@@ -1,0 +1,146 @@
+# Field notes — first run in the car
+
+**2026-09-22, MY25 Volvo XC60, v0.1.0 (versionCode 1), internal test track, drive to work.**
+
+The app installed and ran. All three tabs rendered live data over the car's own LTE, the
+attribution screen is correct, and the Finnish locale was picked up. That is the whole of
+the risky path — build, sign, upload, opt in, install, run on real hardware — working end
+to end on the first attempt.
+
+One drive then produced six findings, five of them real defects. **None of these were
+reachable from the emulator**, which is the argument for doing this early rather than
+after polishing.
+
+Nothing below is fixed yet; this is the worklist for v0.2.
+
+---
+
+## 1. The position never updates — the serious one
+
+Driving from home to work, the app showed **Kt 45: Helsinki – Kehä I the entire way**.
+
+`MainScreen.onCreate` calls `load()` once, `load()` takes one `Locator.fix()`, and nothing
+calls it again except the two retry actions on the error screens. So the app reports
+conditions for wherever the car was when it launched, for as long as it stays open.
+
+This was a **decision, not a slip** — `SPEC.md` §5 says "Car GPS, resolved when the app
+opens", written before anyone had driven with it. It is wrong, and in the way that matters
+most: a road-surface reading for a road you left twenty minutes ago is exactly the class of
+answer this app exists to avoid.
+
+It is also a **review risk**. Quality rule **WE-1** requires content relevant to the user's
+current location, and a frozen position is arguable non-compliance at the blocking review
+for open testing or production.
+
+**Fix.** Re-resolve while the app is in the foreground and refetch when the car has moved
+meaningfully. Points to settle:
+
+- Distance threshold rather than a timer — the interesting change is "the nearest station
+  or section is now a different one", not "60 seconds passed". Something around 2 km.
+- The backend caches road data for 300 s, so refetching faster than that only burns the
+  car's data allowance for identical bytes.
+- Refresh on resume too: the app will often be reopened mid-drive rather than left up.
+- `requestLocationUpdates` in place of one-shot `getCurrentLocation`, released when the
+  screen stops.
+
+---
+
+## 2. English leaking into a Finnish UI, from two different causes
+
+Visible as **"clear · 4 m/s"** on the Sää tab and **"The sensor has a fault"** on the Tie
+tab, both surrounded by Finnish.
+
+### 2a. The app never asks the backend for a language
+
+`Api.kt` calls `/v1/forecast?lat&lon&hours` with no `lang`. The backend defaults to `en`.
+Verified live:
+
+```
+no lang   → smartsymboltext = 'clear'
+&lang=fi  → smartsymboltext = 'selkeää'
+```
+
+FMI localise the text themselves, so this is a one-line client fix: pass the car's locale
+through on `/v1/forecast`, and on `/v1/observations` and `/v1/road` for consistency.
+
+### 2b. The backend throws away the Finnish text Digitraffic already sends
+
+`road.sensor_map()` reads `sensorValueDescriptionEn` and nothing else. Digitraffic in fact
+send both:
+
+```json
+"KELI_1": { "sensorValueDescriptionEn": "The sensor has a fault",
+            "sensorValueDescriptionFi": "Anturissa on vikaa" }
+```
+
+So the Finnish string was there all along and the proxy discarded it. `/v1/road` needs a
+`lang` parameter that selects the field.
+
+**No Swedish.** Digitraffic publish `...Fi` and `...En` only, so `sv` has to fall back —
+English is the better fallback than Finnish for a Swedish speaker. Worth stating in the
+spec rather than leaving to chance.
+
+---
+
+## 3. A faulty sensor is displayed as a road condition
+
+The Tie tab read:
+
+```
+8,0 °C
+Ei liukkausriskiä
+Tienpinta
+─────────────────
+The sensor has a fault        ← where "Kuiva" belongs
+Ilma 8,8 °C · Kastepiste 7,8 °C
+```
+
+Confirmed live: `station.condition` really is `"The sensor has a fault"` at
+`vt3_Helsinki_Pirkkola`, with `KELI_1` value `0.0`. The app passes the description straight
+into the title slot reserved for the surface state.
+
+The ice-risk line above it is **not** affected — it is derived from FMI's road temperature,
+a different source — so nothing unsafe was shown. But a fault message sitting in the
+condition slot, directly under a reassuring "Ei liukkausriskiä", is precisely the
+presentation `SPEC.md` §2 says must never happen: absent data must not read as an answer.
+
+**Fix.** Treat a `KELI` fault as missing: show the condition row as unavailable, as §6
+already specifies for a null station. The fault detail belongs nowhere on this screen.
+
+---
+
+## 4. The station id is shown raw
+
+`vt3_Helsinki_Pirkkola` on screen. Already solved in the design preview
+(`prettyStation` → `Vt 3 Helsinki Pirkkola`) and simply not yet in the app.
+
+---
+
+## 5. The Finnish reliability line reads badly
+
+`· ennustetta ei tue tiesääasema` is a literal translation of a phrase that was already
+clumsy in English. The preview now says *"Estimated — no sensor on this stretch"*; Finnish
+wants something like **"Arvio — ei tiesääasemaa tällä välillä"**.
+
+---
+
+## 6. Not a defect, but worth a look: 4 h road surface at 19,0 °C
+
+The outlook ran `0h 8,4 °C · 2h 8,0 °C · 4h 19,0 °C` while the air forecast for the same
+window was 12,7 → 14,3 °C. Sun on asphalt genuinely does run ten degrees above air, so
+**this is plausible rather than wrong** — but it is a large step between two adjacent rows
+and it comes from Digitraffic, not from us. Worth re-checking on a cloudy day before
+deciding it is real.
+
+---
+
+## What the drive did not turn up
+
+Worth recording, because these were the things most likely to break:
+
+- No crash, no ANR, no blank template.
+- The car's own LTE served every request; no timeout path was hit.
+- Location permission had already been granted and was not re-prompted.
+- The tab strip, the Finnish locale and the attribution screen all behaved.
+- `minCarApiLevel 6` and `TabTemplate` are accepted by the real Google Automotive App
+  Host, not just by the emulator.
