@@ -24,6 +24,21 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
+/**
+ * `vt3_Helsinki_Pirkkola` → `Vt 3 Helsinki Pirkkola`.
+ *
+ * Fintraffic name stations for their own systems. A driver reads a road
+ * number, and the raw identifier was on screen in v0.1.0.
+ */
+internal fun prettyStation(raw: String): String =
+    raw.replace('_', ' ')
+        .replace(Regex("^([a-z]{1,2})(\\d+)")) { m ->
+            m.groupValues[1].replaceFirstChar { it.uppercase() } + " " + m.groupValues[2]
+        }
+
+/** How far the car must travel before the reading on screen is stale. */
+private const val MOVED_ENOUGH_M = 2_000f
+
 private const val TAB_ROAD = "road"
 private const val TAB_WEATHER = "weather"
 private const val TAB_ABOUT = "about"
@@ -43,6 +58,10 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
     private var outsideCoverage = false
     private var failed = false
 
+    /** Where the data on screen is for, so a new fix can be judged against it. */
+    private var loadedLat: Double? = null
+    private var loadedLon: Double? = null
+
     private var road: Road? = null
     private var observation: Observation? = null
     private var forecast: List<ForecastPoint> = emptyList()
@@ -53,6 +72,42 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
 
     override fun onCreate(owner: LifecycleOwner) {
         if (Locator.hasPermission(carContext)) load() else requestLocation()
+    }
+
+    /**
+     * Follow the car while the screen is up.
+     *
+     * v0.1.0 resolved the position once and showed the same road for a whole
+     * commute (`FIELD-NOTES.md` §1). Updates are bound to the visible
+     * lifecycle so nothing keeps the GPS awake behind a different app.
+     */
+    override fun onStart(owner: LifecycleOwner) {
+        Locator.startUpdates(carContext) { fix -> onNewFix(fix) }
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        Locator.stopUpdates(carContext)
+    }
+
+    /**
+     * Reload only once the car has actually gone somewhere else.
+     *
+     * A threshold rather than a timer, because the question is "is a
+     * different station or road section nearest now", not "has a minute
+     * passed". Two kilometres is below the spacing of the road network's
+     * station grid, so a genuine change of nearest station is caught while a
+     * queue at a junction is not.
+     */
+    private fun onNewFix(fix: android.location.Location) {
+        if (loading) return
+        val lat = loadedLat
+        val lon = loadedLon
+        if (lat != null && lon != null) {
+            val moved = FloatArray(1)
+            android.location.Location.distanceBetween(lat, lon, fix.latitude, fix.longitude, moved)
+            if (moved[0] < MOVED_ENOUGH_M) return
+        }
+        load(fix)
     }
 
     private fun requestLocation() {
@@ -70,16 +125,22 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         }
     }
 
-    private fun load() {
+    /**
+     * @param known a fix already in hand, from the location stream. Avoids
+     *   asking for a second one that would only repeat it.
+     */
+    private fun load(known: android.location.Location? = null) {
         loading = true
         failed = false
         outsideCoverage = false
         invalidate()
         lifecycleScope.launch {
-            val fix = Locator.fix(carContext)
+            val fix = known ?: Locator.fix(carContext)
             if (fix == null) {
                 loading = false; failed = true; invalidate(); return@launch
             }
+            loadedLat = fix.latitude
+            loadedLon = fix.longitude
             try {
                 road = Api.road(fix.latitude, fix.longitude)
                 observation = Api.observation(fix.latitude, fix.longitude)
@@ -161,7 +222,13 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         )
         now.addItem(
             Row.Builder()
-                .setTitle(r?.station?.condition ?: carContext.getString(R.string.unavailable))
+                .setTitle(
+                    // A broken sensor is missing data, not a surface state.
+                    // v0.1.0 printed "The sensor has a fault" here, right
+                    // under a reassuring ice-risk line (FIELD-NOTES.md §3).
+                    r?.station?.takeUnless { it.conditionFault }?.condition
+                        ?: carContext.getString(R.string.unavailable),
+                )
                 .addText(
                     "${carContext.getString(R.string.air)} ${temp(surface?.airTempC)}  ·  " +
                         "${carContext.getString(R.string.dew_point)} ${temp(surface?.dewPointC)}",
@@ -173,7 +240,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         surface?.station?.let { name ->
             now.addItem(
                 Row.Builder()
-                    .setTitle(name)
+                    .setTitle(prettyStation(name))
                     .addText(provenance(surface.distanceKm, surface.ageSeconds))
                     .build(),
             )

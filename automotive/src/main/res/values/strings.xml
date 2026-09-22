@@ -43,5 +43,5 @@
     <string name="cond_normal">Normal</string>
     <string name="cond_poor">Poor</string>
     <string name="cond_very_poor">Very poor</string>
-    <string name="no_road_station">· forecast not backed by a road station</string>
+    <string name="no_road_station">· estimated — no sensor on this stretch</string>
 </resources>

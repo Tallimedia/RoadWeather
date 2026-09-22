@@ -43,5 +43,5 @@
     <string name="cond_normal">Normalt</string>
     <string name="cond_poor">Dåligt</string>
     <string name="cond_very_poor">Mycket dåligt</string>
-    <string name="no_road_station">· prognosen stöds inte av en vägstation</string>
+    <string name="no_road_station">· uppskattning — ingen vägstation på denna sträcka</string>
 </resources>

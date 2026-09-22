@@ -5,7 +5,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Looper
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -64,5 +66,49 @@ object Locator {
                 if (cont.isActive) cont.resume(location)
             }
         }
+    }
+
+    /**
+     * Follow the car while the app is in the foreground.
+     *
+     * v0.1.0 took a single fix in `onCreate` and never took another, so a
+     * drive from home to work reported the same road the whole way
+     * (`FIELD-NOTES.md` §1). One fix is right for a watch on a wrist and
+     * wrong for a car.
+     *
+     * The interval is deliberately loose. What matters is not "the car moved"
+     * but "the nearest station or road section is now a different one", and
+     * the backend caches road data for five minutes anyway — asking more often
+     * only spends the car's data on bytes that cannot have changed.
+     */
+    private const val UPDATE_INTERVAL_MS = 60_000L
+    private const val UPDATE_DISTANCE_M = 500f
+
+    private var listener: LocationListener? = null
+
+    @SuppressLint("MissingPermission")
+    fun startUpdates(context: Context, onFix: (Location) -> Unit) {
+        if (!hasPermission(context)) return
+        val manager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+            ?: return
+        stopUpdates(context)
+        val provider = when {
+            manager.isProviderEnabled(LocationManager.GPS_PROVIDER) -> LocationManager.GPS_PROVIDER
+            manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) -> LocationManager.NETWORK_PROVIDER
+            else -> return
+        }
+        val l = LocationListener { location -> onFix(location) }
+        listener = l
+        runCatching {
+            manager.requestLocationUpdates(
+                provider, UPDATE_INTERVAL_MS, UPDATE_DISTANCE_M, l, Looper.getMainLooper(),
+            )
+        }
+    }
+
+    fun stopUpdates(context: Context) {
+        val manager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+        listener?.let { runCatching { manager?.removeUpdates(it) } }
+        listener = null
     }
 }

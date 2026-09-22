@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.0 — 2026-09-22
+
+First drive in the car produced five defects; this is all of them
+(`FIELD-NOTES.md`).
+
+- **Position follows the car.** `load()` ran once in `onCreate`, so a commute
+  showed Kt 45 Kehä I from start to finish. `Locator` now streams updates
+  bound to the visible lifecycle, and `MainScreen` reloads once the car has
+  moved 2 km — a distance threshold rather than a timer, because the question
+  is whether a different station is nearest, not whether a minute has passed.
+  Also a **WE-1** risk resolved: the rule wants content relevant to the
+  driver's current location.
+- **The app asks for a language.** It sent none, so the backend served its
+  `en` default into a Finnish UI. One parameter on all three endpoints.
+- **A broken sensor reads as missing, not as a road state.** Checked both
+  ways: the backend's new `condition_fault` flag, and a text check so this
+  build is correct even against a backend that has not been redeployed.
+- **Station names are readable** — `prettyStation`.
+- **Better wording** in fi/sv/en when a section forecast has no station.
+
 Play refuses a repeated `versionCode`, so **every upload gets a new one** — including
 a rebuild of something never published, because otherwise two different binaries share
 a number and a tester's report cannot be placed against either.

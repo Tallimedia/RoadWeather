@@ -9,6 +9,24 @@ import java.net.URL
 /** Backend base. Same service the watch uses. See BuildConfig.API_BASE. */
 private val BASE = BuildConfig.API_BASE
 
+/**
+ * The language to ask the backend for.
+ *
+ * v0.1.0 asked for none, so the backend served its `en` default and "clear"
+ * appeared in the middle of an otherwise Finnish screen in the car. FMI and
+ * Fintraffic both localise their own text, so this is the whole fix — nothing
+ * is translated here.
+ *
+ * Anything outside fi/sv/en gets `en`: the backend validates the parameter and
+ * would reject, say, `de` outright rather than fall back.
+ */
+private val LANG: String
+    get() = when (java.util.Locale.getDefault().language) {
+        "fi" -> "fi"
+        "sv" -> "sv"
+        else -> "en"
+    }
+
 /** Raised for 404, which means "outside Finland" rather than a failure. */
 class OutsideCoverage : Exception()
 
@@ -17,7 +35,11 @@ data class Surface(
     val station: String?, val distanceKm: Double?, val ageSeconds: Int?,
 )
 
-data class Station(val condition: String?, val freezingPointC: Double?)
+data class Station(
+    val condition: String?, val freezingPointC: Double?,
+    /** The road-state sensor is reporting its own failure, not a reading. */
+    val conditionFault: Boolean = false,
+)
 
 data class OutlookStep(
     val at: String?, val roadCondition: String?, val surface: String?,
@@ -44,10 +66,16 @@ data class ForecastPoint(
     val epoch: Long, val tempC: Double?, val symbolText: String?, val windMs: Double?,
 )
 
+/** Upstream sometimes reports sensor failure in the value field itself. */
+internal fun looksLikeFault(text: String?): Boolean {
+    val t = text?.lowercase() ?: return false
+    return "fault" in t || "vika" in t || "error" in t
+}
+
 object Api {
 
     suspend fun road(lat: Double, lon: Double): Road = withContext(Dispatchers.IO) {
-        val o = get("/v1/road?lat=$lat&lon=$lon")
+        val o = get("/v1/road?lat=$lat&lon=$lon&lang=$LANG")
         Road(
             surface = o.obj("surface")?.let {
                 Surface(
@@ -56,7 +84,14 @@ object Api {
                 )
             },
             station = o.obj("station")?.let {
-                Station(it.str("condition"), it.dbl("freezing_point_c"))
+                // `condition_fault` arrives from a current backend. The text
+                // check is the belt to that braces: this build must not print
+                // "The sensor has a fault" as a road state even if it is
+                // talking to a backend that has not been redeployed yet.
+                Station(
+                    it.str("condition"), it.dbl("freezing_point_c"),
+                    it.optBoolean("condition_fault", false) || looksLikeFault(it.str("condition")),
+                )
             },
             section = o.obj("section")?.let { s ->
                 val steps = s.optJSONArray("outlook")
@@ -85,7 +120,7 @@ object Api {
     }
 
     suspend fun observation(lat: Double, lon: Double): Observation = withContext(Dispatchers.IO) {
-        val o = get("/v1/observations?lat=$lat&lon=$lon")
+        val o = get("/v1/observations?lat=$lat&lon=$lon&lang=$LANG")
         Observation(
             o.str("stationname"), o.dbl("distance"), o.dbl("temperature"),
             o.dbl("windspeedms"), o.dbl("windgust"), o.str("windcompass8"),
@@ -95,7 +130,8 @@ object Api {
 
     suspend fun forecast(lat: Double, lon: Double, hours: Int = 12): List<ForecastPoint> =
         withContext(Dispatchers.IO) {
-            val arr = get("/v1/forecast?lat=$lat&lon=$lon&hours=$hours").optJSONArray("points")
+            val arr = get("/v1/forecast?lat=$lat&lon=$lon&hours=$hours&lang=$LANG")
+                .optJSONArray("points")
             (0 until (arr?.length() ?: 0)).map { i ->
                 val p = arr!!.getJSONObject(i)
                 ForecastPoint(

@@ -43,5 +43,5 @@
     <string name="cond_normal">Normaali</string>
     <string name="cond_poor">Huono</string>
     <string name="cond_very_poor">Erittäin huono</string>
-    <string name="no_road_station">· ennustetta ei tue tiesääasema</string>
+    <string name="no_road_station">· arvio — ei tiesääasemaa tällä välillä</string>
 </resources>

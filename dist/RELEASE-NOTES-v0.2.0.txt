@@ -1,0 +1,15 @@
+FIRoadWeather 0.2.0 (versionCode 2) — internal test track
+
+Fixes from the first drive in the car, 2026-09-22.
+
+* The position now follows the car. v0.1.0 resolved it once at launch and
+  showed the same road for a whole commute. Location updates run while the
+  screen is visible and the data reloads once the car has moved 2 km.
+* Finnish and Swedish text where there was English. The app now tells the
+  backend which language to serve, so "clear" becomes "selkeää" and the road
+  condition arrives translated.
+* A faulty roadside sensor no longer shows as a road condition. "The sensor
+  has a fault" appeared where "Kuiva" belongs, under a reassuring ice line.
+  It now reads as unavailable.
+* Station names are readable: vt3_Helsinki_Pirkkola -> Vt 3 Helsinki Pirkkola.
+* Clearer wording when a road-section forecast has no station behind it.
