@@ -156,24 +156,40 @@ otherwise reach for.
 ### It corrects our spec
 
 **Foreca has a settings screen** — *Lämpötila / Tuulen nopeus / Sade* (units), *Palaute*
-with a support address, *Käyttöehdot ja tietoja*, *Ohjelmistolisenssit* — reached by a
-back-chevron header, so a pushed screen rather than a separate app.
+with a support address, *Käyttöehdot ja tietoja*, *Ohjelmistolisenssit*.
 
-`SPEC.md` §10 said settings were out because "AAOS restricts app-owned activities to
-parked flows". That was **misleading and is now fixed**: `RESEARCH.md` §1 already recorded
-that setup, **settings** and sign-in are the three explicit *exceptions* to that
-restriction. Settings were always available. A shipping competitor using them settles it.
+**Photographed while parked** (Nico, confirmed). That matters, and it narrows the
+conclusion: *settings while parked* is precisely the documented exception, so this is
+Foreca doing the permitted thing rather than evidence of anything more. A first reading of
+the photo took the back-chevron header as proof of a pushed **template** screen, which a
+photograph cannot actually distinguish from an ordinary parked **activity**.
+
+What it does establish is still useful. `SPEC.md` §10 said settings were out because "AAOS
+restricts app-owned activities to parked flows", which implied they were unavailable.
+`RESEARCH.md` §1 already recorded that setup, **settings** and sign-in are the three
+explicit *exceptions* to that restriction, so the two documents contradicted each other.
+That is now fixed.
 
 They stay out of v1 anyway, but for the honest reason: a Finland-only app has one sensible
 answer for each unit. **WE-4** separately forbids making forecast intervals configurable.
+
+**Still unknown, and worth two minutes:** open Foreca's settings *while driving*. If the
+car refuses, it is a parked activity and settings are parked-only in practice. If it
+opens, it is templated and usable in motion. Either answer is worth having before anyone
+plans a settings screen here.
 
 ### What Foreca does that we should copy
 
 - **A feedback address in the app.** `androidsupport@foreca.com`, one row in settings.
   Trivial, and during a closed beta it is the difference between a tester telling you
   something and not bothering.
-- **Terms and software licences as pushed screens**, not a tab. Exactly the ⓘ → About
-  structure `SPEC.md` §1 now specifies, arrived at independently. Good sign.
+- **Terms and software licences behind one entry**, not spending a tab on them. The same
+  conclusion `SPEC.md` §1 reaches with ⓘ → About, arrived at independently — though
+  whether Foreca's is a template or a parked activity is not visible from a photo.
+
+  **Our About is unaffected either way.** It is a `MessageTemplate` pushed from an
+  ActionStrip action: a template, not an app-owned activity, so the parked restriction
+  does not reach it and the attribution stays reachable in motion.
 
 ### What we do that Foreca cannot
 

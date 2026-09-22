@@ -353,7 +353,9 @@ Named so they do not creep in, and so the store listing does not promise them:
   unavailable. That was misleading: `RESEARCH.md` §1 records that setup, settings and
   sign-in are the three *explicit exceptions* to that restriction, and Foreca's car app
   ships a settings screen (units, feedback address, terms, software licences) in this very
-  Volvo. They are excluded because a Finland-only app has nothing worth configuring —
+  Volvo — seen **while parked**, which is exactly the exception and so proves availability
+  rather than anything about driving. They are excluded because a Finland-only app has
+  nothing worth configuring —
   °C, m/s and mm each have exactly one sensible answer here — not because the platform
   says no. **WE-4** does forbid one specific setting: forecast intervals must not be
   customisable via templates.
