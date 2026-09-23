@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.4.0 — 2026-09-23
+
+Layout, settled on the design preview against field photos before any Kotlin
+was written.
+
+- **Labels lead their own row.** A label placed last is orphaned by the
+  divider beneath it and reads as a heading for the *next* row — which is how
+  "Tienpinta" came to caption "ei saatavilla", making a working surface
+  reading look like missing data.
+- **No section headers anywhere.** The host indents them further left than
+  ordinary rows and the Volvo's bezel clips them — visible in every 0.3.0
+  screenshot as `/Nyt` and `>Kt 50`. Both tabs are now one flat list.
+- **Both tabs open with where and when**: station, clock time, and distance
+  recomputed from the live fix rather than frozen at the last fetch. Station
+  coordinates now travel in both payloads to make that possible.
+- **The `0h` step is gone.** Fintraffic tag it `type=OBSERVATION`, not
+  `FORECAST` — it was a second "now" from a different source sitting under a
+  forecast heading. Dropping it buys a fourth real step, out to 12 h.
+- **Sub-zero temperatures are red**, and the four winter KELI states are
+  coloured — keyed on Digitraffic's numeric code, not on the localised
+  description, which would break the day a translation changed.
+- **Weather forecast starts at the next hour.** FMI aligns points to the
+  requested step, so 3-hourly alone left a gap of up to three hours before
+  the first row — 2 h 14 min on the 09:46 drive. Now hourly twice, then
+  3-hourly, with rain probability finally rendered.
+- **Row counts come from the car.** `ConstraintManager.getContentLimit`
+  replaces a guess copied from Android Auto's documented minimum.
+- `gust` was a hardcoded English literal; it is a string resource now.
+
 ## 0.3.0 — 2026-09-22
 
 - **The app no longer dies mid-drive.** The host allows five templates per task

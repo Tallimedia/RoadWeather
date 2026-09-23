@@ -1,0 +1,39 @@
+<fi-FI>
+Selkeämpi ulkoasu molemmilla välilehdillä.
+
+• Jokainen rivi kertoo nyt ensin mitä luku tarkoittaa. Aiemmin "Tienpinta"
+  näytti kuuluvan seuraavalle riville.
+• Ylin rivi kertoo havaintoaseman, kellonajan ja etäisyyden sijainnistasi.
+• Pakkaslukemat näkyvät punaisena.
+• Tiejakson ennusteeseen mahtuu nyt neljä askelta, 12 tuntiin asti.
+• Sään ennuste alkaa seuraavasta tunnista, ei enää kolmen tunnin päästä.
+  Mukana sademäärän todennäköisyys.
+
+Testaa: onko näkymä selkeämpi ajaessa?
+</fi-FI>
+<sv-SE>
+Tydligare layout på båda flikarna.
+
+• Varje rad börjar nu med vad värdet betyder. Tidigare såg "Vägyta" ut att
+  höra till nästa rad.
+• Översta raden visar station, klockslag och avstånd från dig.
+• Minusgrader visas i rött.
+• Vägprognosen rymmer nu fyra steg, upp till 12 timmar.
+• Väderprognosen börjar nästa timme i stället för om tre timmar, och visar
+  regnsannolikhet.
+
+Testa: är vyn tydligare under körning?
+</sv-SE>
+<en-US>
+Clearer layout on both tabs.
+
+• Every row now starts with what the value means. Previously "Road surface"
+  looked like it belonged to the next row.
+• The top row gives the station, the time and the distance from you.
+• Sub-zero temperatures are shown in red.
+• The road forecast now fits four steps, out to 12 hours.
+• The weather forecast starts at the next hour rather than up to three hours
+  away, and shows rain probability.
+
+Worth testing: is the view easier to read while driving?
+</en-US>

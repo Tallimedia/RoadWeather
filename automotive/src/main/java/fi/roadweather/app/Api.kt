@@ -33,17 +33,33 @@ class OutsideCoverage : Exception()
 data class Surface(
     val roadTempC: Double?, val airTempC: Double?, val dewPointC: Double?,
     val station: String?, val distanceKm: Double?, val ageSeconds: Int?,
+    /** When the surface temperature was measured, for the head row. */
+    val measuredAt: Long?,
 )
 
 data class Station(
     val condition: String?, val freezingPointC: Double?,
     /** The road-state sensor is reporting its own failure, not a reading. */
     val conditionFault: Boolean = false,
+    val name: String? = null, val distanceKm: Double? = null,
+    /** Where the station is, so the distance can be kept true while moving. */
+    val lat: Double? = null, val lon: Double? = null,
+    val saltGM2: Double? = null,
+    /**
+     * Raw KELI code, 0-9, per Digitraffic's published table. Colour and
+     * branching key on this rather than on [condition]: the description is
+     * localised, so matching its text breaks silently the day a translation
+     * is edited, and cannot tell "Kuura" from "Kuiva" without knowing every
+     * language.
+     */
+    val conditionCode: Int? = null,
 )
 
 data class OutlookStep(
     val at: String?, val roadCondition: String?, val surface: String?,
     val roadTempC: Double?, val reliable: Boolean,
+    /** Digitraffic tag the 0h step OBSERVATION, not FORECAST. */
+    val isObservation: Boolean = false,
 )
 
 data class Section(val description: String?, val outlook: List<OutlookStep>)
@@ -60,10 +76,13 @@ data class Observation(
     val station: String?, val distanceKm: Double?, val tempC: Double?,
     val windMs: Double?, val gustMs: Double?, val compass: String?,
     val humidityPct: Double?, val ageSeconds: Int?,
+    val epoch: Long? = null,
+    val lat: Double? = null, val lon: Double? = null,
 )
 
 data class ForecastPoint(
     val epoch: Long, val tempC: Double?, val symbolText: String?, val windMs: Double?,
+    val gustMs: Double? = null, val compass: String? = null, val popPct: Double? = null,
 )
 
 /** Upstream sometimes reports sensor failure in the value field itself. */
@@ -81,6 +100,7 @@ object Api {
                 Surface(
                     it.dbl("road_temp_c"), it.dbl("air_temp_c"), it.dbl("dew_point_c"),
                     it.str("station"), it.dbl("distance_km"), it.intOrNull("age_seconds"),
+                    it.obj("at")?.optLong("road_temp_c")?.takeIf { v -> v != 0L },
                 )
             },
             station = o.obj("station")?.let {
@@ -91,6 +111,10 @@ object Api {
                 Station(
                     it.str("condition"), it.dbl("freezing_point_c"),
                     it.optBoolean("condition_fault", false) || looksLikeFault(it.str("condition")),
+                    it.str("name"), it.dbl("distance_km"),
+                    it.dbl("lat"), it.dbl("lon"),
+                    it.dbl("salt_g_m2"),
+                    it.dbl("condition_code")?.toInt(),
                 )
             },
             section = o.obj("section")?.let { s ->
@@ -105,6 +129,7 @@ object Api {
                             // Digitraffic is candid about whether a road station
                             // backed the forecast; we pass that candour on.
                             reliable = f.str("reliability") == "SUCCESSFUL",
+                            isObservation = f.str("type") == "OBSERVATION",
                         )
                     },
                 )
@@ -125,18 +150,30 @@ object Api {
             o.str("stationname"), o.dbl("distance"), o.dbl("temperature"),
             o.dbl("windspeedms"), o.dbl("windgust"), o.str("windcompass8"),
             o.dbl("humidity"), o.intOrNull("age_seconds"),
+            o.optLong("epochtime").takeIf { it != 0L },
+            o.dbl("station_lat"), o.dbl("station_lon"),
         )
     }
 
-    suspend fun forecast(lat: Double, lon: Double, hours: Int = 12): List<ForecastPoint> =
+    /**
+     * Hourly for the near term, one call.
+     *
+     * FMI aligns points to the requested step, so a pure 3-hourly request can
+     * leave a gap of up to three hours before the first row — 2 h 14 min on
+     * the drive that found this (FIELD-NOTES.md, 2026-09-23). `weatherV04`
+     * on the design preview settled the fix: ask for hourly (`step=60`) and
+     * have the caller pick every third point beyond the first two.
+     */
+    suspend fun forecast(lat: Double, lon: Double, hours: Int = 14): List<ForecastPoint> =
         withContext(Dispatchers.IO) {
-            val arr = get("/v1/forecast?lat=$lat&lon=$lon&hours=$hours&lang=$LANG")
+            val arr = get("/v1/forecast?lat=$lat&lon=$lon&hours=$hours&step=60&lang=$LANG")
                 .optJSONArray("points")
             (0 until (arr?.length() ?: 0)).map { i ->
                 val p = arr!!.getJSONObject(i)
                 ForecastPoint(
                     p.optLong("epochtime"), p.dbl("temperature"),
                     p.str("smartsymboltext"), p.dbl("windspeedms"),
+                    p.dbl("hourlymaximumgust"), p.str("windcompass8"), p.dbl("pop"),
                 )
             }
         }

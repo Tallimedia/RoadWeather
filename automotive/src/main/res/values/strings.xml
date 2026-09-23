@@ -44,4 +44,15 @@
     <string name="cond_poor">Poor</string>
     <string name="cond_very_poor">Very poor</string>
     <string name="no_road_station">· estimated — no sensor on this stretch</string>
+
+    <string name="road_station">Road station</string>
+    <string name="freezes_at">Freezes at %1$s</string>
+    <string name="salt">salt %1$s g/m²</string>
+    <string name="from_you">%1$s km from you</string>
+    <string name="wind">Wind %1$s</string>
+    <string name="gust">gust %1$s</string>
+    <string name="rain">rain %1$d%%</string>
+    <string name="observation">Observation</string>
+    <string name="forecast_estimated">Forecast — estimated, no sensor on this stretch</string>
+    <string name="forecast_label">Forecast</string>
 </resources>

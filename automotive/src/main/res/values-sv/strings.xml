@@ -44,4 +44,15 @@
     <string name="cond_poor">Dåligt</string>
     <string name="cond_very_poor">Mycket dåligt</string>
     <string name="no_road_station">· uppskattning — ingen vägstation på denna sträcka</string>
+
+    <string name="road_station">Vägväderstation</string>
+    <string name="freezes_at">Fryser vid %1$s</string>
+    <string name="salt">salt %1$s g/m²</string>
+    <string name="from_you">%1$s km från dig</string>
+    <string name="wind">Vind %1$s</string>
+    <string name="gust">by %1$s</string>
+    <string name="rain">regn %1$d %%</string>
+    <string name="observation">Observation</string>
+    <string name="forecast_estimated">Prognos — uppskattning, ingen vägstation på denna sträcka</string>
+    <string name="forecast_label">Prognos</string>
 </resources>

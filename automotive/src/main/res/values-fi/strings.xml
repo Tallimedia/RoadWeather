@@ -44,4 +44,15 @@
     <string name="cond_poor">Huono</string>
     <string name="cond_very_poor">Erittäin huono</string>
     <string name="no_road_station">· arvio — ei tiesääasemaa tällä välillä</string>
+
+    <string name="road_station">Tiesääasema</string>
+    <string name="freezes_at">Jäätyy %1$s</string>
+    <string name="salt">suolaa %1$s g/m²</string>
+    <string name="from_you">%1$s km sijainnistasi</string>
+    <string name="wind">Tuuli %1$s</string>
+    <string name="gust">puuska %1$s</string>
+    <string name="rain">sade %1$d %%</string>
+    <string name="observation">Havainto</string>
+    <string name="forecast_estimated">Ennuste — arvio, ei tiesääasemaa tällä välillä</string>
+    <string name="forecast_label">Ennuste</string>
 </resources>
