@@ -55,4 +55,5 @@
     <string name="observation">Observation</string>
     <string name="forecast_estimated">Prognos — uppskattning, ingen vägstation på denna sträcka</string>
     <string name="forecast_label">Prognos</string>
+    <string name="no_connection_stale">Ingen anslutning — visar senaste avläsningen</string>
 </resources>

@@ -1,0 +1,24 @@
+<fi-FI>
+Korjaus pitkiä ajomatkoja varten.
+
+Verkkokatkoksen aikana sovellus näytti aiemmin virheilmoituksen ja saattoi
+lakata vastaamasta useamman katkoksen jälkeen. Nyt viimeisin lukema jää
+näkyviin ja merkitään "Ei yhteyttä", eikä sovellus enää kaadu heikon peiton
+alueella.
+</fi-FI>
+<sv-SE>
+Korrigering inför längre körsträckor.
+
+Vid ett tillfälligt anslutningsavbrott visade appen tidigare ett felmeddelande
+och kunde sluta svara efter flera avbrott. Nu visas den senaste avläsningen
+kvar, märkt "Ingen anslutning", och appen slutar inte fungera i områden med
+svag täckning.
+</sv-SE>
+<en-US>
+Fix for longer drives.
+
+During a brief connection drop, the app previously showed an error card and
+could stop responding after several drops. The last reading now stays on
+screen, marked "No connection", and the app no longer breaks down in areas
+with weak coverage.
+</en-US>

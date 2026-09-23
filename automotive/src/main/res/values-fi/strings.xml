@@ -55,4 +55,5 @@
     <string name="observation">Havainto</string>
     <string name="forecast_estimated">Ennuste — arvio, ei tiesääasemaa tällä välillä</string>
     <string name="forecast_label">Ennuste</string>
+    <string name="no_connection_stale">Ei yhteyttä — näytetään viimeisin lukema</string>
 </resources>

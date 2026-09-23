@@ -55,4 +55,5 @@
     <string name="observation">Observation</string>
     <string name="forecast_estimated">Forecast — estimated, no sensor on this stretch</string>
     <string name="forecast_label">Forecast</string>
+    <string name="no_connection_stale">No connection — showing last reading</string>
 </resources>

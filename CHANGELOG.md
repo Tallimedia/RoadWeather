@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.1 — 2026-09-23
+
+Found ahead of a long-drive test, not yet in the field: the failure path
+still swapped template types.
+
+- **A connection dropout no longer discards the reading on screen.**
+  `failed -> message(...)` fired on every blip, spending two steps of the
+  five-template quota per drop — the same pattern that took the app out in
+  0.2.0, just triggered by weak coverage instead of movement. The error card
+  now only appears on a cold start with nothing to show yet; a dropout with
+  a reading already up marks it "No connection" on the head row instead and
+  keeps going.
+- **`failed` is excluded from the redraw signature on purpose.** A blip alone
+  must not force a repaint; the stale note appears at the next redraw that
+  happens anyway (a tab tap, or recovery), so noticing it a few seconds late
+  costs nothing, where spending the quota on every blip costs the app.
+- Matches `SPEC.md` §6, written on 2026-09-21 and unimplemented until now:
+  "No network → last cached reading with its age, clearly marked stale."
+
 ## 0.4.0 — 2026-09-23
 
 Layout, settled on the design preview against field photos before any Kotlin

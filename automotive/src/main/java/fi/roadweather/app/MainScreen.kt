@@ -94,6 +94,24 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
      * host actually enforces, and falls back to the documented floor only if
      * the manager is unavailable.
      */
+    /**
+     * "No connection, showing what we last had" — SPEC.md §6's designed
+     * state for a dropout, not an error card. Only appears on the head row,
+     * which already had a free second text line, so it costs nothing from
+     * the row budget.
+     *
+     * Can lag a failure by one redraw: `failed` is deliberately excluded from
+     * `signature()`, so a blip alone does not force a repaint — only the next
+     * legitimate one (a tab tap, or new data on recovery) picks it up. That
+     * is the trade this whole mechanism exists for: noticing a dropout a few
+     * seconds late costs nothing, spending the quota on every blip costs the
+     * app.
+     */
+    private fun staleNote(): CharSequence? {
+        if (!failed) return null
+        return colourSpan(carContext.getString(R.string.no_connection_stale), CarColor.YELLOW)
+    }
+
     private val listRowLimit: Int by lazy {
         runCatching {
             carContext.getCarService(ConstraintManager::class.java)
@@ -180,15 +198,14 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
     /**
      * What the screen would draw, reduced to a string.
      *
-     * The host counts a new template against a five-per-task quota unless it
-     * is the same type with the same main content, and there is no way to ask
-     * whether a given change qualifies. So the app stops guessing and simply
-     * does not push a template when the visible result would be identical —
-     * a refetch on the far side of a village usually returns the same station
-     * and the same rounded numbers.
+     * `failed` is deliberately **not** part of this. A dropout changes no
+     * data — the reading on screen is still the last good one — so letting it
+     * move the signature would push a template for nothing, twice per blip.
+     * The stale marker appears at the next redraw that happens anyway: a tab
+     * tap, or the recovery that brings new data.
      */
     private fun signature(): String = listOf(
-        activeTab, permissionDenied, outsideCoverage, failed,
+        activeTab, permissionDenied, outsideCoverage,
         road?.surface?.station, road?.surface?.roadTempC, road?.risk,
         road?.station?.condition, road?.station?.conditionFault,
         road?.section?.description, road?.section?.outlook?.size,
@@ -266,7 +283,12 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         // whole app out mid-drive (FIELD-NOTES.md §7).
         loading && !hasContent -> message(R.string.loading, null, null)
         outsideCoverage -> message(R.string.err_outside_finland, R.string.retry) { load() }
-        failed -> message(R.string.err_no_connection, R.string.retry) { load() }
+        // A dropout must not throw away a good reading. Swapping to a
+        // MessageTemplate and back costs two steps of a five-template quota
+        // per blip — the exact pattern that took the app out in 0.2.0 — and
+        // on a rural road there are several. The last reading stays up,
+        // marked stale, which is also what SPEC.md §6 always specified.
+        failed && !hasContent -> message(R.string.err_no_connection, R.string.retry) { load() }
         activeTab == TAB_WEATHER -> weatherTemplate()
         else -> roadTemplate()
     }
@@ -321,6 +343,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
                 Row.Builder()
                     .setTitle(prettyStation(stationName))
                     .addText(parts.joinToString(" · "))
+                    .apply { staleNote()?.let { addText(it) } }
                     .build(),
             )
         }
@@ -429,6 +452,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
                 Row.Builder()
                     .setTitle(o.station)
                     .addText(parts.joinToString(" · "))
+                    .apply { staleNote()?.let { addText(it) } }
                     .build(),
             )
         }
