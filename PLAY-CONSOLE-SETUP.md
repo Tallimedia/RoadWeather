@@ -198,8 +198,15 @@ Capture screenshots from the **generic** emulator AVDs once the app runs —
 ## 5. Store settings and distribution
 
 - **App category:** Weather
-- **Countries:** Finland. The data is Finnish-only; listing it worldwide invites
-  one-star reviews from people it cannot serve.
+- **Countries:** Finland. **Set and confirmed 2026-09-24.** Countries are configured once
+  on the default Production channel (Puhelimet, Tabletit, Chrome OS, Android XR —
+  Testaa ja julkaise → Tuotanto → `Maat/alueet`) and the AAOS channel **inherits it
+  automatically**: switching the channel selector to "Vain Automotive OS" shows the same
+  tab reading *"Sovellus tulee saataville samoilla alueilla kuin puhelin- ja
+  tablettisovellus"* with Suomi already listed, `Kohdistettu`. No separate AAOS-specific
+  setting exists, and none was needed — one shared country list per track, not per form
+  factor. The data is Finnish-only; listing it worldwide invites one-star reviews from
+  people it cannot serve.
 - **Contact details:** email, plus `https://www.tallimedia.com/`
 
 ---
