@@ -80,6 +80,15 @@ This matters more than it looks: a trader's name and address are **published on 
 store listing**, and on a personal account the address on file is a home address. If the
 backend is ever monetised, this needs revisiting first — see D11.
 
+**Checked 2026-09-24, and it is not there yet.** The full `Kehittäjätili` (Developer
+account) page was read top to bottom in Console — `Tietoa sinusta`, `Yhteystiedot`,
+`Kehittäjän profiili`, `Yhdistetyt kehittäjätilit` — with no trader/DSA declaration
+anywhere on it. Most likely explanation: Google surfaces this at the point of submitting
+a release aimed at **open testing or production**, not as a standing page for an app that
+has only ever been on the internal test track. **Nothing to do while internal-only** —
+re-check when preparing the first release past internal testing, rather than searching
+Console again before then.
+
 ---
 
 ## 3. App content declarations
