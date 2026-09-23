@@ -343,8 +343,9 @@ decides whether a layout is a design or a wish:
 | A tab holds | exactly **one** template (`TabContents`) |
 | `Row` | optional icon + title + **2** secondary lines (`ROW_CONSTRAINTS_SIMPLE`, `maxTextLinesPerRow = 2`) |
 | `GridItem` | image + title + **1** text line. No second line exists |
-| Safe item budget | **6** while moving |
+| Safe item budget | **6**, from Android Auto's documented minimum — **superseded**: 0.4.0 queries `ConstraintManager.getContentLimit(CONTENT_LIMIT_TYPE_LIST)` at runtime instead of assuming this number. This car returned more than 6 (§2a). Query it here too rather than reusing this row |
 | `TabTemplate` | `@RequiresCarApi(6)` — which is why `minCarApiLevel` is 6 |
+| Template quota | **5 templates per task**, and a changed row title counts as a new one, not a free refresh — found the expensive way in 0.2.0/0.4.1 and written up in `RESEARCH.md` §3a. Any design here that redraws on a timer or on location has to be built around that from the start, not discovered by it |
 | `SectionedItemTemplate`, `RowSection`, `GridSection` | present in 1.7.0 but **`@ExperimentalCarApi`** |
 
 **The consequence, and it killed the first mockup.** Rows and grid tiles cannot share a

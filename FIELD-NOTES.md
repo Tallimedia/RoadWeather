@@ -329,3 +329,79 @@ done. The surface temperature stays the headline (`SPEC.md` §2 stands).
 inside the quota over a long drive with tab switching. If v0.3.0 still dies, the title
 change is the next lever — but it should not come to that, since a commute produces only
 a handful of genuinely different readings.
+
+---
+
+# Third run — v0.3.0 verification, 2026-09-22
+
+**Confirms the quota fix.** 09:18–09:46, 28 minutes, six station changes and four section
+changes crossing Kt 51 → Vt 1 → Kt 50, plenty of tab switching, **zero errors**. The fault
+handling worked in the wild too: a sensor at Suutarila Länsi read "ei saatavilla" instead
+of dumping its error text on screen. §7 closed.
+
+Three findings from the same drive, none of them the quota:
+
+1. **Section headers clip under the Volvo's bezel.** `SectionedItemList` headers ("Nyt",
+   the road name) render further left than ordinary rows and disappear off the left edge —
+   visible in every screenshot as `/Nyt` and `>Kt 50`. Row content itself was fine.
+2. **A label placed last is orphaned by the divider beneath it and reads as a heading for
+   the next row.** "Tienpinta" appeared to caption "ei saatavilla" on the row below it,
+   though it was actually the label for the surface temperature above it — a working
+   reading made to look like missing data on the one tab where that is the one thing that
+   must never happen (`SPEC.md` §2).
+3. **`0h` in the outlook is not a forecast.** Confirmed live: Fintraffic tag it
+   `type=OBSERVATION`, every other step `type=FORECAST`. It was sitting under a "Ennuste"
+   heading, contradicting the reading above it by a few tenths, and had no `arvio` marker
+   because it genuinely isn't an estimate — it just looked like one.
+
+Also raised and resolved by discussion rather than a screenshot: the Weather tab's forecast
+had a blind spot of up to three hours because FMI aligns points to the requested step; a
+3-hourly request can start as late as 3 hours out. Fixed by requesting `step=60` and
+picking hourly-then-3-hourly in the client.
+
+These four findings are what became the v0.4.0 layout (`SPEC.md` §2a/§3a): no section
+headers anywhere, every label leads its own row, `0h` dropped in favour of a fourth real
+forecast step, and hourly-then-3-hourly forecasting.
+
+Benchmarked against **Foreca** in the same car the same day — see the entry under the
+first run, above. One correction made there stands: the Foreca settings screenshots were
+taken parked, which is the documented exception for app-owned activities, so they only
+prove settings-while-parked is possible, not anything about driving.
+
+---
+
+# Fourth run — v0.4.0, 2026-09-23
+
+Confirms the v0.3.0 diagnosis and the redesign both hold, and turns up the next round.
+
+- **Position genuinely follows the car**: station and section changed together, six times
+  in 28 minutes, matching the actual route driven (Kt 51 → Vt 1 → Kt 50).
+- **No error, no dead tab strip** — the quota fix from v0.3.0 survives a longer,
+  more eventful drive.
+- The redesigned Road tab reads correctly: label leads value, station name up top with
+  distance and time, four forecast steps out to 12 h.
+
+Two decisions made from this drive that shaped v0.4.0 before it was built, both already in
+`SPEC.md` §2a/§3a: dropping the duplicate "Sää nyt / Nyt" head-title repetition down to one
+"where and when" row per tab, and giving the Road tab the same "station first" opening the
+Weather tab already had. Neither is a defect so much as a refinement asked for directly
+against the live demo before the Kotlin was written — the design-preview loop working as
+intended.
+
+**Not yet re-verified on the road:** whether the bezel-clipping theory (§ Third run,
+finding 1) actually cleared once section headers were removed. The next drive is the first
+chance to confirm rows now sit far enough right.
+
+---
+
+# v0.4.1 — found ahead of the field, not in it
+
+Unlike every fix above, this one was **not** caught by a screenshot. Reviewing the failure
+path before Friday's planned long drive found that `failed -> message(...)` still swapped
+`ListTemplate` for `MessageTemplate` on every connection drop — the identical quota cost
+the v0.3.0 fix removed from the loading path, just triggered by weak coverage instead of
+movement. Fixed the same way: the last reading stays on screen, marked stale, and `failed`
+is excluded from the redraw signature so a blip alone cannot force a repaint.
+
+**Unverified until the long drive**: whether a real multi-gap rural route confirms this,
+and whether the "no connection" note is legible and not alarming at a glance.
