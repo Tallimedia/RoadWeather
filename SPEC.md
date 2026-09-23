@@ -43,6 +43,47 @@ naturally a Pane and a List.
 
 ## 2. Road tab
 
+> **Shipped in 0.4.0.** The layout below is the v1 design; §2a records what the
+> tab actually renders now, after three drives' worth of corrections.
+
+### 2a. As built (0.4.0)
+
+```
+Kt 51 Hki Lapinlahti
+Tiesääasema · klo 17.23 · 2,2 km sijainnistasi
+──────────────────────────────────────────────
+Tienpinta  11,9 °C          ← red below zero
+Ei liukkausriskiä
+Ilma 11,3 °C · Kastepiste 10,3 °C
+──────────────────────────────────────────────
+Keli  Kuiva                 ← coloured by KELI code 5/6/7/9
+Jäätyy -0,1 °C · suolaa 0,0 g/m²
+──────────────────────────────────────────────
+Kt 51: Helsinki - Kehä III
+Ennuste — arvio, ei tiesääasemaa tällä välillä
+──────────────────────────────────────────────
+2 h   11,0 °C   Märkä
+4 h   10,0 °C   Kostea
+6 h    9,0 °C   Kostea
+12 h   7,0 °C   Märkä
+```
+
+Three rules this encodes, each bought with a defect:
+
+- **A label leads its row, never trails it.** Trailing, it is orphaned by the
+  divider and reads as a heading for the next row — "Tienpinta" appeared to
+  caption "ei saatavilla" while actually reporting the temperature above it.
+- **No `SectionedItemList`.** The host indents section headers further left
+  than rows and the Volvo bezel clips them. There is no padding or inset API
+  anywhere in the library, so the answer is not to use headers.
+- **`0h` is not a forecast.** Fintraffic tag it `type=OBSERVATION`. It is
+  filtered out, which buys a fourth real step.
+
+Row counts come from `ConstraintManager.getContentLimit(CONTENT_LIMIT_TYPE_LIST)`
+rather than the six copied from Android Auto's documented minimum.
+
+### 2b. Original v1 design
+
 **Headline: road surface temperature, with the ice-risk line directly beneath it.**
 That pairing is the whole product. Air temperature above zero says nothing about the
 road — the surface radiates to the sky and runs colder, and bridges colder still — so
@@ -86,6 +127,38 @@ the surface number leads and air temperature is secondary.
 ---
 
 ## 3. Weather tab
+
+> **Shipped in 0.4.0.** As built:
+
+```
+Helsinki Kaisaniemi
+Havainto klo 17.20 · 0,7 km sijainnistasi
+──────────────────────────────────────────────
+Nyt      11,4 °C
+Tuuli NE 3,0 m/s · puuska 5,8
+Pilvistä
+──────────────────────────────────────────────
+klo 18   11,4 °C
+Tuuli NE 4,3 m/s · puuska 7,4
+Pilvistä · sade 65 %
+──────────────────────────────────────────────
+klo 19 · klo 22 · klo 01 …
+```
+
+`Nyt` and every forecast step share one shape, so the temperature, wind and
+condition columns line up and can be compared by scanning down.
+
+**Hourly for the first two steps, then three-hourly.** FMI aligns points to
+the requested step, so a pure three-hourly request left a gap of up to three
+hours before the first row — 2 h 14 min on the 09:46 drive. The app asks for
+`step=60` and picks indices 0, 1, 4, 7, 10.
+
+**The distance is recomputed from the live fix**, not carried from the
+backend: the served figure is only true for the coordinates that request held
+and freezes until the next fetch, up to 2 km stale. Station coordinates travel
+in both payloads for this.
+
+### 3a. Original v1 design
 
 From `/v1/observations` and `/v1/forecast`, both already live.
 
@@ -337,9 +410,18 @@ Codes run 1–107 with **night variants at +100**. They do not need one drawable
 107 codes collapse to roughly fifteen distinct conditions, and a `when` mapping to a small
 vector set is far less work and far more legible on a car screen than 107 bitmaps.
 
-Quality rule **IU-1** forbids images in car apps *except* "a single static image for
-content context", and names a weather icon as the example — so this is explicitly allowed
-rather than merely tolerated.
+**Icons are required, not merely permitted** — and an earlier draft of this paragraph had
+it wrong. It claimed IU-1 "names a weather icon as the example"; IU-1 in fact says *"a
+single static image for content context, **such as album art or the advertiser's corporate
+logo**"*, which is about a backdrop, not a per-row symbol.
+
+The rule that actually governs this is **WE-3**, from the weather category itself:
+
+> Forecast information must include easily readable icons and symbols.
+
+So the forecast rows are *obliged* to carry icons. That reframes them from a v1.1
+nicety into a **likely gap at the blocking review** for open testing or production —
+worth closing before either, not after.
 
 ## 10. Explicitly out of v1
 
