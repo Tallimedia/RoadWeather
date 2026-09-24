@@ -405,3 +405,22 @@ is excluded from the redraw signature so a blip alone cannot force a repaint.
 
 **Unverified until the long drive**: whether a real multi-gap rural route confirms this,
 and whether the "no connection" note is legible and not alarming at a glance.
+
+---
+
+# Stationary check — v0.4.1, 2026-09-24
+
+Parked, not driving — screenshots only confirm layout, not the things that matter most
+(position tracking, quota headroom). Logged because it closes one open item outright.
+
+**The bezel-clipping theory holds.** Flagged as unconfirmed after the fourth run: every
+row on both tabs now reads cleanly from the left edge in these screenshots — no `/Nyt`,
+no `>Kt 51`. Removing section headers in favour of label-leading ordinary rows fixed it.
+
+Also visually correct: the hourly-then-3-hourly forecast lands exactly on the designed
+indices (14:00, 15:00, 18:00, 21:00, 00:00 from a 14:00 baseline — indices 0,1,4,7,10);
+four road forecast steps with `0h` dropped; live distance populated and plausible from two
+different stations (7,2 km, 1,1 km); every label leads its value.
+
+**Still open, and this check cannot answer it:** whether position updates and the template
+quota hold over the drive later today, and the real one on Friday.
