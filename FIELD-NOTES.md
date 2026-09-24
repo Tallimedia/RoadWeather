@@ -424,3 +424,37 @@ different stations (7,2 km, 1,1 km); every label leads its value.
 
 **Still open, and this check cannot answer it:** whether position updates and the template
 quota hold over the drive later today, and the real one on Friday.
+
+---
+
+# Locks while driving — v0.4.1, 2026-09-24
+
+Reported after the stationary check above, same day, actually moving. Sequence, confirmed
+directly with Nico: started the app fully **while parked**, screens rendered normally,
+started driving — the system's own **"Ei käytettävissä ajon aikana"** lock appeared
+(shield icon, "Odota, että olet pysäköinyt auton..."), every time, immediately. Stopping
+cleared it immediately. This is not the app's own error template (`err_no_connection`
+reads "Ei yhteyttä"; the earlier quota-era message read "Tätä tehtävää ei voi suorittaa
+ajon aikana" with a warning triangle) — it is the host's own system-level restriction
+screen, substituted for whatever the app last rendered.
+
+Ruled out first: not a launch-time restriction (confirmed — app was already open and
+working before movement started), not a crash (no error state, clean recovery on stop),
+not a coding mistake that could be spotted by inspection — no `startActivity`/`Intent(`
+anywhere in the app, one `Activity` declared and it is `distractionOptimized="true"`, the
+Car App Library ships no restriction-listener API at all (confirmed by listing every class
+in the AAR — nothing named `Restriction` exists outside `model.constraints`).
+
+**One real defect found and fixed regardless (v0.4.2):** `listRowLimit` was `by lazy` —
+queried once, at the first template build, always while parked since that is when the app
+launches, and cached for the screen's whole lifetime. `ConstraintManager.getContentLimit()`
+is a live query by design; caching it defeats that. Now queried fresh on every call.
+
+**Honestly unconfirmed whether this is the actual cause.** Checked against Google's
+driver-distraction docs: a templated third-party app cannot register for driving-state
+change notifications at all — `CarUxRestrictionsManager` needs
+`android.car.permission.CAR_DRIVING_STATE`, a `@SystemApi` restricted to the platform,
+bundled system apps and privileged partners. So it is not established that the content
+limit genuinely varies live between parked and driving, only that caching a value meant to
+be re-queried was wrong regardless. **Needs a real drive to confirm or rule out** — Nico
+plans a system reset alongside testing v0.4.2.
