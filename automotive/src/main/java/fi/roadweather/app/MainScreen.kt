@@ -112,12 +112,34 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         return colourSpan(carContext.getString(R.string.no_connection_stale), CarColor.YELLOW)
     }
 
-    private val listRowLimit: Int by lazy {
-        runCatching {
+    /**
+     * The host's real row budget for a list, read **fresh on every call**.
+     *
+     * Was `by lazy` — queried once, the first time the screen built a
+     * template, and cached for the screen's whole lifetime. Because the app
+     * is always launched while parked, that first query always captured the
+     * generous parked-time limit. AAOS tightens what it permits once the car
+     * starts moving; `getContentLimit` exists precisely so an app can ask
+     * again and adapt, not so it can be asked once and assumed forever.
+     *
+     * Caching it meant: launch parked, render 7-8 rows under the parked
+     * limit, car starts moving, the platform's actual permitted content
+     * shrinks, our last template — still sized to the stale parked number —
+     * is now non-compliant, and the host has to block the screen rather than
+     * keep showing something it is no longer allowed to. Stopping relaxes
+     * the restriction back to parked levels, and the same stale template
+     * becomes compliant again "by accident" — which is exactly the
+     * lock-while-moving/recover-on-stop pattern found in the field on
+     * 2026-09-24 (`FIELD-NOTES.md`).
+     *
+     * The call itself is cheap and local — no network round trip — so there
+     * is no cost to asking on every `onGetTemplate()` instead of once.
+     */
+    private val listRowLimit: Int
+        get() = runCatching {
             carContext.getCarService(ConstraintManager::class.java)
                 .getContentLimit(ConstraintManager.CONTENT_LIMIT_TYPE_LIST)
         }.getOrDefault(6).coerceAtLeast(4)
-    }
 
     override fun onCreate(owner: LifecycleOwner) {
         if (Locator.hasPermission(carContext)) load() else requestLocation()

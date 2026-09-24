@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.4.2 — 2026-09-24
+
+Found in the field, not yet confirmed fixed: the app locked with the system's own
+"Ei käytettävissä ajon aikana" screen the moment the car started moving, every time,
+recovering the moment it stopped. Reported after launching the app fully while parked —
+not a launch-time restriction, an already-open screen going non-compliant.
+
+- **`listRowLimit` was `by lazy`** — queried once, the first time a template was built,
+  cached for the screen's whole lifetime. Since the app is always launched parked, that
+  first query always captured whatever `ConstraintManager.getContentLimit()` returns while
+  parked. It is now queried fresh on every template build instead.
+- **Honest uncertainty, not a confirmed fix.** Checked against Google's own docs: a
+  templated app cannot listen for driving-state changes at all —
+  `CarUxRestrictionsManager` needs `android.car.permission.CAR_DRIVING_STATE`, a
+  `@SystemApi` restricted to the platform, bundled system apps and privileged partners.
+  So it isn't certain the content limit genuinely varies live with driving state, or that
+  removing the cache is the actual mechanism behind the lock — only that caching it was
+  wrong regardless, and querying fresh costs nothing. Needs a real drive to confirm.
+
 ## 0.4.1 — 2026-09-23
 
 Found ahead of a long-drive test, not yet in the field: the failure path

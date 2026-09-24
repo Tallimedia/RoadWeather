@@ -1,0 +1,21 @@
+<fi-FI>
+Mahdollinen korjaus: sovellus lukkiutui liikkeelle lähdettäessä.
+
+Korjasi sen, että sovellus kysyi näytön rivimäärän vain kerran käynnistyessä
+pysäköitynä, sen sijaan että kysyisi sitä joka kerta uudelleen. Ei vielä
+varmistettu ajossa — testaa ja kerro, jatkuuko lukkiutuminen.
+</fi-FI>
+<sv-SE>
+Möjlig korrigering: appen låste sig när bilen började röra sig.
+
+Fixade att appen bara frågade efter radantalet en gång vid start, medan
+bilen stod stilla, i stället för att fråga på nytt varje gång. Inte
+bekräftat under körning ännu — testa och berätta om låsningen kvarstår.
+</sv-SE>
+<en-US>
+Possible fix: the app locked up when the car started moving.
+
+Fixed the app asking for its allowed row count only once at parked launch,
+instead of asking fresh every time. Not yet confirmed while driving — test
+and let us know if the lock-up continues.
+</en-US>
