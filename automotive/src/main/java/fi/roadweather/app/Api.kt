@@ -91,6 +91,23 @@ internal fun looksLikeFault(text: String?): Boolean {
     return "fault" in t || "vika" in t || "error" in t
 }
 
+/** One FMI CAP alert whose polygon contains the car's position. Rare — the
+ * backend already filters to local, land-relevant alerts (RESEARCH.md §5.6). */
+data class WeatherWarning(
+    val event: String?, val headline: String?, val colour: String?,
+)
+
+data class Restriction(val type: String?, val quantity: Double?, val unit: String?)
+
+/** A road work or traffic announcement near the car, closest first. */
+data class RoadNotice(
+    val type: String?, val title: String?, val road: Int?, val roadName: String?,
+    val municipality: String?, val distanceKm: Double, val severity: String?,
+    val restrictions: List<Restriction>, val ends: String?,
+)
+
+data class Warnings(val warnings: List<WeatherWarning>, val roadNotices: List<RoadNotice>)
+
 object Api {
 
     suspend fun road(lat: Double, lon: Double): Road = withContext(Dispatchers.IO) {
@@ -177,6 +194,31 @@ object Api {
                 )
             }
         }
+
+    suspend fun warnings(lat: Double, lon: Double): Warnings = withContext(Dispatchers.IO) {
+        val o = get("/v1/warnings?lat=$lat&lon=$lon&lang=$LANG")
+        val alerts = o.optJSONArray("warnings")
+        val notices = o.optJSONArray("road_notices")
+        Warnings(
+            warnings = (0 until (alerts?.length() ?: 0)).map { i ->
+                val w = alerts!!.getJSONObject(i)
+                WeatherWarning(w.str("event"), w.str("headline"), w.str("colour"))
+            },
+            roadNotices = (0 until (notices?.length() ?: 0)).map { i ->
+                val n = notices!!.getJSONObject(i)
+                val restrictions = n.optJSONArray("restrictions")
+                RoadNotice(
+                    n.str("type"), n.str("title"), n.intOrNull("road"), n.str("road_name"),
+                    n.str("municipality"), n.dbl("distance_km") ?: 0.0, n.str("severity"),
+                    (0 until (restrictions?.length() ?: 0)).map { j ->
+                        val r = restrictions!!.getJSONObject(j)
+                        Restriction(r.str("type"), r.dbl("quantity"), r.str("unit"))
+                    },
+                    n.str("ends"),
+                )
+            },
+        )
+    }
 
     private fun get(path: String): JSONObject {
         val conn = (URL(BASE + path).openConnection() as HttpURLConnection).apply {

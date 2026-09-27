@@ -6,7 +6,9 @@ import android.text.Spanned
 import androidx.car.app.CarContext
 import androidx.car.app.constraints.ConstraintManager
 import androidx.car.app.Screen
+import androidx.car.app.ScreenManager
 import androidx.car.app.model.Action
+import androidx.car.app.model.ActionStrip
 import androidx.car.app.model.CarColor
 import androidx.car.app.model.CarIcon
 import androidx.car.app.model.ForegroundCarColorSpan
@@ -41,11 +43,13 @@ private const val MOVED_ENOUGH_M = 2_000f
 
 private const val TAB_ROAD = "road"
 private const val TAB_WEATHER = "weather"
-private const val TAB_ABOUT = "about"
+private const val TAB_WARNINGS = "warnings"
 
 /**
- * Every screen of the app, because [TabTemplate] owns its tab contents rather
- * than pushing separate screens.
+ * The three tabs — Road, Weather, Warnings. [TabTemplate] owns their contents
+ * directly, so switching tabs never pushes a screen. About is the one
+ * exception: it lives in [AboutScreen], pushed from the ⓘ action on each
+ * tab's [ActionStrip] — the app's only other [Screen].
  *
  * Templates are immutable and rebuilt on [invalidate], so state lives here and
  * [onGetTemplate] is a pure render of it.
@@ -79,6 +83,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
     private var road: Road? = null
     private var observation: Observation? = null
     private var forecast: List<ForecastPoint> = emptyList()
+    private var warnings: Warnings? = null
 
     init {
         lifecycle.addObserver(this)
@@ -232,6 +237,8 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         road?.station?.condition, road?.station?.conditionFault,
         road?.section?.description, road?.section?.outlook?.size,
         observation?.station, observation?.tempC, forecast.firstOrNull()?.epoch,
+        warnings?.warnings?.size, warnings?.roadNotices?.size,
+        warnings?.roadNotices?.firstOrNull()?.distanceKm,
     ).joinToString("|")
 
     private var rendered: String? = null
@@ -255,6 +262,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
                 road = Api.road(fix.latitude, fix.longitude)
                 observation = Api.observation(fix.latitude, fix.longitude)
                 forecast = Api.forecast(fix.latitude, fix.longitude)
+                warnings = Api.warnings(fix.latitude, fix.longitude)
             } catch (_: OutsideCoverage) {
                 outsideCoverage = true
             } catch (_: Exception) {
@@ -280,7 +288,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         builder.setHeaderAction(Action.APP_ICON)
         builder.addTab(tab(TAB_ROAD, R.string.tab_road, R.drawable.ic_road))
         builder.addTab(tab(TAB_WEATHER, R.string.tab_weather, R.drawable.ic_weather))
-        builder.addTab(tab(TAB_ABOUT, R.string.tab_about, R.drawable.ic_info))
+        builder.addTab(tab(TAB_WARNINGS, R.string.tab_warnings, R.drawable.ic_warnings))
         // Without this the host throws "Template requires setting content ID
         // for the active tab when not in Loading state" — the tab list and the
         // contents are matched by id, not by position.
@@ -297,7 +305,6 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             .build()
 
     private fun content(): Template = when {
-        activeTab == TAB_ABOUT -> aboutTemplate()
         permissionDenied -> message(R.string.err_location_denied, R.string.grant) { requestLocation() }
         // Only when there is nothing yet. On a reload the previous reading
         // stays on screen: swapping to a MessageTemplate and back spends two
@@ -312,8 +319,23 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         // marked stale, which is also what SPEC.md §6 always specified.
         failed && !hasContent -> message(R.string.err_no_connection, R.string.retry) { load() }
         activeTab == TAB_WEATHER -> weatherTemplate()
+        activeTab == TAB_WARNINGS -> warningsTemplate()
         else -> roadTemplate()
     }
+
+    /**
+     * Pushed onto [ScreenManager] rather than reached by a tab, so Warnings
+     * could have the third slot (`SPEC.md` §1). Uses `ic_info`, the drawable
+     * the old About tab icon already shipped with.
+     */
+    private fun infoAction(): Action = Action.Builder()
+        .setIcon(CarIcon.Builder(IconCompat.createWithResource(carContext, R.drawable.ic_info)).build())
+        .setOnClickListener {
+            carContext.getCarService(ScreenManager::class.java).push(AboutScreen(carContext))
+        }
+        .build()
+
+    private fun infoStrip(): ActionStrip = ActionStrip.Builder().addAction(infoAction()).build()
 
     private fun message(text: Int, actionLabel: Int?, onAction: (() -> Unit)?): Template {
         val b = MessageTemplate.Builder(carContext.getString(text))
@@ -493,6 +515,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         }
         return ListTemplate.Builder()
             .setSingleList(items.build())
+            .setActionStrip(infoStrip())
             .build()
     }
 
@@ -519,37 +542,145 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
 
     // --------------------------------------------------------------- about
 
-    private fun aboutTemplate(): Template {
+    /**
+     * FMI land warnings by severity, then nearby road notices by distance —
+     * `SPEC.md` §4b. FMI alone is usually empty here (the feed is mostly
+     * marine, and this app is land-only); road works are what makes the tab
+     * worth opening most days.
+     */
+    private fun warningsTemplate(): Template {
+        val w = warnings
         val items = ItemList.Builder()
-            .addItem(
+        val alerts = w?.warnings.orEmpty()
+        val notices = w?.roadNotices.orEmpty()
+
+        if (w == null) {
+            // Nothing fetched yet — distinct from a fetch that came back
+            // empty, so this never claims "no warnings" before it is true.
+            return ListTemplate.Builder()
+                .setSingleList(items.build())
+                .setActionStrip(infoStrip())
+                .build()
+        }
+
+        if (alerts.isEmpty() && notices.isEmpty()) {
+            // A real, designed state, not a placeholder (SPEC.md §4b) —
+            // Utsjoki returns zero of both on a normal day.
+            items.addItem(
+                Row.Builder().setTitle(carContext.getString(R.string.warnings_none)).build(),
+            )
+        }
+
+        val budget = listRowLimit
+        var used = 0
+        alerts.take(2).forEach { a ->
+            if (used >= budget) return@forEach
+            val cls = when (a.colour) {
+                "red", "orange" -> CarColor.RED
+                "yellow" -> CarColor.YELLOW
+                else -> null
+            }
+            val title = a.event ?: carContext.getString(R.string.warnings_alert_fallback)
+            items.addItem(
                 Row.Builder()
-                    .setTitle(carContext.getString(R.string.about_title))
-                    .addText(BuildConfig.VERSION_NAME)
+                    .setTitle(if (cls != null) colourSpan(title, cls) else title)
+                    .apply { a.headline?.let { addText(it) } }
                     .build(),
             )
-            // Attribution in the app, not only in the store listing. Both
-            // licences require it.
-            .addItem(
+            used++
+        }
+        notices.forEach { n ->
+            if (used >= budget) return@forEach
+            val what = restrictionLine(n)
+            val where = listOfNotNull(
+                n.road?.let { carContext.getString(R.string.road_number, it) },
+                n.roadName, n.municipality,
+            ).joinToString(" · ").ifEmpty { n.title.orEmpty() }
+            val sevCls = when (n.severity) {
+                "HIGHEST" -> CarColor.RED
+                "HIGH" -> CarColor.YELLOW
+                else -> null
+            }
+            val titleText = "${fi1(n.distanceKm)} km   $where"
+            items.addItem(
                 Row.Builder()
-                    .setTitle("Data")
-                    .addText(carContext.getString(R.string.about_sources))
+                    .setTitle(if (sevCls != null) colourSpan(titleText, sevCls) else titleText)
+                    .addText(what.ifEmpty {
+                        if (n.type == "ROAD_WORK") carContext.getString(R.string.warnings_road_work)
+                        else carContext.getString(R.string.warnings_announcement)
+                    })
+                    .apply { untilText(n)?.let { addText(it) } }
                     .build(),
             )
-            .addItem(
-                Row.Builder()
-                    .setTitle("—")
-                    .addText(carContext.getString(R.string.about_independent))
-                    .build(),
-            )
-            .addItem(
-                Row.Builder()
-                    .setTitle("—")
-                    .addText(carContext.getString(R.string.about_safety))
-                    .build(),
-            )
+            used++
+        }
+
         return ListTemplate.Builder()
             .setSingleList(items.build())
+            .setActionStrip(infoStrip())
             .build()
+    }
+
+    /** The restriction is the headline, not the category — "One carriageway
+     * closed" says what a driver needs, "roadwork" does not. */
+    private fun restrictionLine(n: RoadNotice): String {
+        val parts = n.restrictions
+            .filterNot { it.type == "SPEED_LIMIT_LENGTH" } // a qualifier, not a fact on its own
+            .mapNotNull { r ->
+                val label = restrictionLabel(r.type) ?: return@mapNotNull null
+                if (r.quantity != null) {
+                    "$label ${r.quantity.toInt()}${r.unit?.let { " $it" } ?: ""}"
+                } else label
+            }
+        return parts.take(2).joinToString(" · ")
+    }
+
+    private fun restrictionLabel(type: String?): String? = when (type) {
+        "SPEED_LIMIT" -> carContext.getString(R.string.restr_speed_limit)
+        "SINGLE_LANE_CLOSED" -> carContext.getString(R.string.restr_single_lane_closed)
+        "MULTIPLE_LANES_CLOSED" -> carContext.getString(R.string.restr_multiple_lanes_closed)
+        "SINGLE_CARRIAGEWAY_CLOSED" -> carContext.getString(R.string.restr_carriageway_closed)
+        "ROAD_CLOSED" -> carContext.getString(R.string.restr_road_closed)
+        "SINGLE_ALTERNATE_LINE_TRAFFIC" -> carContext.getString(R.string.restr_alternating)
+        "NARROW_LANES" -> carContext.getString(R.string.restr_narrow_lanes)
+        "TRAFFIC_LIGHTS" -> carContext.getString(R.string.restr_traffic_lights)
+        "DETOUR" -> carContext.getString(R.string.restr_detour)
+        "INTERMITTENT_SHORT_TERM_STOPS", "INTERMITTENT_STOPS_AND_CLOSURE_EFFECTIVE" ->
+            carContext.getString(R.string.restr_stops)
+        "SLOW_MOVING_MAINTENANCE_VEHICLE" -> carContext.getString(R.string.restr_slow_vehicle)
+        "VEHICLE_WIDTH_LIMIT" -> carContext.getString(R.string.restr_width_limit)
+        "VEHICLE_HEIGHT_LIMIT" -> carContext.getString(R.string.restr_height_limit)
+        "NARROW_OR_CLOSED_PEDESTRIAN_AND_BICYLE_PATH" -> carContext.getString(R.string.restr_path_closed)
+        "OPEN_FIRE_HEATER_IN_USE" -> carContext.getString(R.string.restr_open_flame)
+        else -> null
+    }
+
+    /** Some of these run to 2027; "until 2 Oct" reads very differently from a
+     * two-year closure, and "long-term" says so without a full date row. */
+    private fun untilText(n: RoadNotice): CharSequence? {
+        val endsRaw = n.ends ?: return null
+        val end = runCatching { java.time.Instant.parse(endsRaw) }.getOrNull() ?: return null
+        val days = java.time.Duration.between(java.time.Instant.now(), end).toDays()
+        return when {
+            days > 120 -> carContext.getString(R.string.warnings_long_term)
+            days < 1 -> carContext.getString(R.string.warnings_until_today, hhmm(end.epochSecond))
+            else -> {
+                val local = end.atZone(java.time.ZoneId.systemDefault())
+                carContext.getString(
+                    R.string.warnings_until_date, local.dayOfMonth,
+                    monthShort(local.monthValue),
+                )
+            }
+        }
+    }
+
+    private fun monthShort(month: Int): String {
+        val keys = arrayOf(
+            R.string.month_1, R.string.month_2, R.string.month_3, R.string.month_4,
+            R.string.month_5, R.string.month_6, R.string.month_7, R.string.month_8,
+            R.string.month_9, R.string.month_10, R.string.month_11, R.string.month_12,
+        )
+        return carContext.getString(keys[(month - 1).coerceIn(0, 11)])
     }
 
     // -------------------------------------------------------------- format

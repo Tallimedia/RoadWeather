@@ -56,4 +56,45 @@
     <string name="forecast_estimated">Forecast — estimated, no sensor on this stretch</string>
     <string name="forecast_label">Forecast</string>
     <string name="no_connection_stale">No connection — showing last reading</string>
+
+    <string name="tab_warnings">Warnings</string>
+    <string name="road_number">Road %1$d</string>
+
+    <string name="warnings_none">No warnings, and no road works nearby</string>
+    <string name="warnings_alert_fallback">Warning</string>
+    <string name="warnings_road_work">Road work</string>
+    <string name="warnings_announcement">Traffic announcement</string>
+    <string name="warnings_long_term">Long-term</string>
+    <string name="warnings_until_today">Until %1$s today</string>
+    <string name="warnings_until_date">Until %1$d %2$s</string>
+
+    <string name="restr_speed_limit">Speed limit</string>
+    <string name="restr_single_lane_closed">One lane closed</string>
+    <string name="restr_multiple_lanes_closed">Several lanes closed</string>
+    <string name="restr_carriageway_closed">One carriageway closed</string>
+    <string name="restr_road_closed">Road closed</string>
+    <string name="restr_alternating">Alternating one-way</string>
+    <string name="restr_narrow_lanes">Narrowed lanes</string>
+    <string name="restr_traffic_lights">Temporary traffic lights</string>
+    <string name="restr_detour">Detour in place</string>
+    <string name="restr_stops">Short stops</string>
+    <string name="restr_slow_vehicle">Slow maintenance vehicle</string>
+    <string name="restr_width_limit">Max width</string>
+    <string name="restr_height_limit">Max height</string>
+
+    <string name="month_1">Jan</string>
+    <string name="month_2">Feb</string>
+    <string name="month_3">Mar</string>
+    <string name="month_4">Apr</string>
+    <string name="month_5">May</string>
+    <string name="month_6">Jun</string>
+    <string name="month_7">Jul</string>
+    <string name="month_8">Aug</string>
+    <string name="month_9">Sep</string>
+    <string name="month_10">Oct</string>
+    <string name="month_11">Nov</string>
+    <string name="month_12">Dec</string>
+
+    <string name="restr_path_closed">Footpath/cycle path narrowed</string>
+    <string name="restr_open_flame">Open-flame heater</string>
 </resources>

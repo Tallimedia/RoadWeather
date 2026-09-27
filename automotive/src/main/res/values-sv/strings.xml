@@ -56,4 +56,45 @@
     <string name="forecast_estimated">Prognos — uppskattning, ingen vägstation på denna sträcka</string>
     <string name="forecast_label">Prognos</string>
     <string name="no_connection_stale">Ingen anslutning — visar senaste avläsningen</string>
+
+    <string name="tab_warnings">Varningar</string>
+    <string name="road_number">Väg %1$d</string>
+
+    <string name="warnings_none">Inga varningar, och inga vägarbeten i närheten</string>
+    <string name="warnings_alert_fallback">Varning</string>
+    <string name="warnings_road_work">Vägarbete</string>
+    <string name="warnings_announcement">Trafikmeddelande</string>
+    <string name="warnings_long_term">Långvarigt</string>
+    <string name="warnings_until_today">Till kl. %1$s idag</string>
+    <string name="warnings_until_date">Till %1$d %2$s</string>
+
+    <string name="restr_speed_limit">Hastighetsbegränsning</string>
+    <string name="restr_single_lane_closed">Ett körfält avstängt</string>
+    <string name="restr_multiple_lanes_closed">Flera körfält avstängda</string>
+    <string name="restr_carriageway_closed">En körbana avstängd</string>
+    <string name="restr_road_closed">Vägen avstängd</string>
+    <string name="restr_alternating">Växelvis trafik</string>
+    <string name="restr_narrow_lanes">Smalare körfält</string>
+    <string name="restr_traffic_lights">Tillfälliga trafikljus</string>
+    <string name="restr_detour">Omledning i bruk</string>
+    <string name="restr_stops">Korta stopp</string>
+    <string name="restr_slow_vehicle">Långsamt arbetsfordon</string>
+    <string name="restr_width_limit">Maxbredd</string>
+    <string name="restr_height_limit">Maxhöjd</string>
+
+    <string name="month_1">jan</string>
+    <string name="month_2">feb</string>
+    <string name="month_3">mar</string>
+    <string name="month_4">apr</string>
+    <string name="month_5">maj</string>
+    <string name="month_6">jun</string>
+    <string name="month_7">jul</string>
+    <string name="month_8">aug</string>
+    <string name="month_9">sep</string>
+    <string name="month_10">okt</string>
+    <string name="month_11">nov</string>
+    <string name="month_12">dec</string>
+
+    <string name="restr_path_closed">Gång-/cykelväg smalare</string>
+    <string name="restr_open_flame">Öppen värmare i bruk</string>
 </resources>

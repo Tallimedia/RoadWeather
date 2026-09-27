@@ -1,0 +1,26 @@
+<fi-FI>
+Uusi Varoitukset-välilehti.
+
+Kolmas välilehti näyttää nyt sääkeskukselta vaaralliset kelivaroitukset ja
+lähistön tietyöt etäisyysjärjestyksessä. Tietoja-sivu siirtyi kolmoisviivan
+i-painikkeen taakse yläreunassa.
+
+Testaa: löytyykö i-painike ja toimiiko takaisin-nuoli Tietoja-sivulta?
+</fi-FI>
+<sv-SE>
+Ny flik för Varningar.
+
+Den tredje fliken visar nu vägvädervarningar och närliggande vägarbeten,
+sorterade efter avstånd. Om-sidan flyttades bakom info-knappen (ⓘ) högst upp.
+
+Testa: hittar du info-knappen, och fungerar tillbaka-pilen från Om-sidan?
+</sv-SE>
+<en-US>
+New Warnings tab.
+
+The third tab now shows weather warnings and nearby road works, ranked by
+distance. The About page moved behind the ⓘ button at the top.
+
+Worth testing: can you find the ⓘ button, and does the back arrow work from
+the About page?
+</en-US>

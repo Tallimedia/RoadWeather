@@ -56,4 +56,45 @@
     <string name="forecast_estimated">Ennuste — arvio, ei tiesääasemaa tällä välillä</string>
     <string name="forecast_label">Ennuste</string>
     <string name="no_connection_stale">Ei yhteyttä — näytetään viimeisin lukema</string>
+
+    <string name="tab_warnings">Varoitukset</string>
+    <string name="road_number">Tie %1$d</string>
+
+    <string name="warnings_none">Ei varoituksia, eikä tietöitä lähistöllä</string>
+    <string name="warnings_alert_fallback">Varoitus</string>
+    <string name="warnings_road_work">Tietyö</string>
+    <string name="warnings_announcement">Liikennetiedote</string>
+    <string name="warnings_long_term">Pitkäaikainen</string>
+    <string name="warnings_until_today">Tänään klo %1$s asti</string>
+    <string name="warnings_until_date">%1$d.%2$s asti</string>
+
+    <string name="restr_speed_limit">Nopeusrajoitus</string>
+    <string name="restr_single_lane_closed">Yksi kaista suljettu</string>
+    <string name="restr_multiple_lanes_closed">Useita kaistoja suljettu</string>
+    <string name="restr_carriageway_closed">Yksi ajorata suljettu</string>
+    <string name="restr_road_closed">Tie suljettu</string>
+    <string name="restr_alternating">Vuoroliikenne</string>
+    <string name="restr_narrow_lanes">Kavennetut kaistat</string>
+    <string name="restr_traffic_lights">Tilapäiset liikennevalot</string>
+    <string name="restr_detour">Kiertotie käytössä</string>
+    <string name="restr_stops">Lyhyitä pysähdyksiä</string>
+    <string name="restr_slow_vehicle">Hidas työkone</string>
+    <string name="restr_width_limit">Enimmäisleveys</string>
+    <string name="restr_height_limit">Enimmäiskorkeus</string>
+
+    <string name="month_1">tammi</string>
+    <string name="month_2">helmi</string>
+    <string name="month_3">maalis</string>
+    <string name="month_4">huhti</string>
+    <string name="month_5">touko</string>
+    <string name="month_6">kesä</string>
+    <string name="month_7">heinä</string>
+    <string name="month_8">elo</string>
+    <string name="month_9">syys</string>
+    <string name="month_10">loka</string>
+    <string name="month_11">marras</string>
+    <string name="month_12">joulu</string>
+
+    <string name="restr_path_closed">Jalankulku-/pyörätie kavennettu</string>
+    <string name="restr_open_flame">Avotulilämmitin käytössä</string>
 </resources>

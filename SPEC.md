@@ -182,6 +182,12 @@ Forecast rows come from `points[]`. `smartsymboltext` gives a plain-language con
 
 ## 4. About screen
 
+> **Shipped in 0.5.0** — reached by the ⓘ action as specified, but as a `ListTemplate`, not
+> the `MessageTemplate` below. The original 0.4.x tab was already a `ListTemplate` and this
+> release only moved it behind the action and pushed it via `ScreenManager` — the app's
+> first pushed `Screen`. Changing the template type was not part of that move and was
+> deliberately left out rather than expanded mid-change. Still open for a later pass.
+
 Reached by the **ⓘ** action, not a tab (§1). A **MessageTemplate**, not a list. As four full-height Rows it dominated the screen for
 content nobody reads twice (Nico, 2026-09-22); a MessageTemplate is one icon and one
 block of text, and still carries the attribution both licences oblige, **in the app** and
@@ -197,6 +203,13 @@ not only in the store listing:
 ---
 
 ## 4b. Warnings tab
+
+> **Shipped in 0.5.0.** As designed below, with two corrections found against live data
+> rather than assumed: the default radius is **whatever the backend returns**, not a
+> client-enforced 25 km — the client trusts `road_notices` as already ranked and filtered.
+> Two restriction types appeared live that were not in the first pass
+> (`NARROW_OR_CLOSED_PEDESTRIAN_AND_BICYLE_PATH`, `OPEN_FIRE_HEATER_IN_USE`); both now have
+> fi/sv/en labels rather than falling through to the generic "Road work" text.
 
 Added 2026-09-22 at Nico's suggestion, on `/v1/warnings`. The research behind the source
 choice is `RESEARCH.md` §5.6; the short version is that **FMI alone would show an empty

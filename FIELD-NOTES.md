@@ -473,3 +473,24 @@ changes, the dropout handling from v0.4.1, no crashes, no dead tab strip.
 
 **v0.4.2 is now the confirmed-stable baseline.** Next real-world test is whatever v0.5
 introduces (the app's first push/pop screen navigation, for About moving to an ⓘ action).
+
+---
+
+# v0.5.0 built — Warnings tab, not yet field-tested, 2026-09-27
+
+Built on the confirmed-stable v0.4.2 baseline (no locks all weekend). Warnings replaces
+About in the tab strip; About moves to an ⓘ action, pushed via `ScreenManager` — the app's
+first use of push/pop screen navigation, deliberately never bundled with anything else
+risky for exactly that reason.
+
+Verified against live data before building: the sample restriction types in the design
+(`SPEED_LIMIT`, `SINGLE_CARRIAGEWAY_CLOSED`, etc.) matched, but two more turned up
+(`NARROW_OR_CLOSED_PEDESTRIAN_AND_BICYLE_PATH`, `OPEN_FIRE_HEATER_IN_USE`) that the design
+work hadn't seen — both now have real labels rather than degrading to the generic
+fallback. A long-running roadwork (`ends: 2027-09-30`) correctly resolves to "Pitkäaikainen"
+rather than a misleading date.
+
+**Nothing here has run in the car yet.** Needs its own dedicated drive: does the ⓘ work,
+does the back arrow return cleanly to the tab it was on, and — the real question — does
+pushing and popping a screen interact with the template quota any differently than the
+tab-switching this app has only ever done before.

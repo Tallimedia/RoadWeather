@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.5.0 — 2026-09-27
+
+**Warnings tab**, replacing About in the strip. FMI land warnings by severity, then nearby
+road notices by distance, matching `SPEC.md` §4b and the design settled on the demo weeks
+ago. Backend (`/v1/warnings`) has been live since then; this is the app side.
+
+- **About moved to an ⓘ action**, pushed as a real `Screen` — the app's first use of
+  `ScreenManager.push()`. Every template before this was drawn by `MainScreen` switching on
+  its own tab state; nothing was ever pushed. The host supplies the back chevron once the
+  stack holds more than one screen.
+- **The restriction is the headline, not the category** — "One carriageway closed",
+  "Speed limit 50 km/h", not "Road work". Two restriction types turned up in live data that
+  weren't in the first pass (`NARROW_OR_CLOSED_PEDESTRIAN_AND_BICYLE_PATH`,
+  `OPEN_FIRE_HEATER_IN_USE`); both degrade to a generic fallback rather than dropping the
+  notice, and both now have proper fi/sv/en labels.
+- **"Until 2 Oct" vs "Long-term"** — some road works run for a year or more; a bare date
+  would mislead about how long a closure actually is.
+- **A real empty state, not a placeholder** — most places most days will show nothing, and
+  that is stated plainly rather than left blank.
+- Row budget uses the same live `ConstraintManager` query as the other two tabs, not a
+  hardcoded count.
+
+**Not yet field-tested.** The push/pop navigation is genuinely new ground for this app —
+its own dedicated drive, not bundled with anything else.
+
 ## 0.4.2 — 2026-09-24
 
 Found in the field, not yet confirmed fixed: the app locked with the system's own
