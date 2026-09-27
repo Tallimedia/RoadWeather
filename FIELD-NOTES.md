@@ -458,3 +458,18 @@ bundled system apps and privileged partners. So it is not established that the c
 limit genuinely varies live between parked and driving, only that caching a value meant to
 be re-queried was wrong regardless. **Needs a real drive to confirm or rule out** — Nico
 plans a system reset alongside testing v0.4.2.
+
+---
+
+# Driving lock — confirmed fixed, weekend long-drive test, 2026-09-27
+
+**No locks at all** across the full weekend trip (Friday drive up, Saturday return —
+the ~300 km round trip this whole test cycle was built around), running v0.4.2. Closes
+the one real unknown left from the previous entry: removing the cached `listRowLimit`
+was the actual fix, not just a correct-but-unrelated cleanup.
+
+Everything else held too across a drive of that length: position tracking, station/section
+changes, the dropout handling from v0.4.1, no crashes, no dead tab strip.
+
+**v0.4.2 is now the confirmed-stable baseline.** Next real-world test is whatever v0.5
+introduces (the app's first push/pop screen navigation, for About moving to an ⓘ action).
