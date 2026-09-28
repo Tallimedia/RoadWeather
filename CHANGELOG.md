@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.1 — 2026-09-28
+
+**Reverts the ⓘ action from 0.5.0.** Found in the field within hours of upload: no info
+button ever appeared, Weather stopped switching after one tap, and Warnings crashed the
+app outright. About is a tab again — Road, Weather, Warnings, About — exactly the pattern
+that was stable across six previous releases.
+
+Two separate defects in the 0.5.0 approach, best understood together:
+
+- **The icon never rendered at all.** A `ListTemplate`'s own `ActionStrip` is not honoured
+  once that template is wrapped as `TabContents` inside a `TabTemplate` — only the
+  `TabTemplate`'s single header action (the app icon) is drawn. This was true from the very
+  first render, before any tab switch.
+- **Every tab switch built a brand-new `Action` with a brand-new `OnClickListener` closure.**
+  Two closures are never equal to each other even when functionally identical, so the host
+  almost certainly counted every tab switch as a full new step against the five-template
+  quota rather than a free refresh — several times more expensive than plain tab switching
+  had ever been. Two taps drained it; Warnings, hit last, crashed.
+
+Neither was caught by compiling, because both are host-rendering and host-comparison
+behaviour, not type errors. `AboutScreen.kt` — the pushed-`Screen` version — stays in the
+repo unused, documented as unverified, rather than deleted; the investigative work is not
+wasted even though this release doesn't use it.
+
 ## 0.5.0 — 2026-09-27
 
 **Warnings tab**, replacing About in the strip. FMI land warnings by severity, then nearby

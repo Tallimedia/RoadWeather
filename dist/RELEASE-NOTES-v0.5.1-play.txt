@@ -1,0 +1,21 @@
+<fi-FI>
+Korjaus: 0.5.0 kaatui välilehteä vaihdettaessa.
+
+Uusi i-painike ei toiminut, ja se sai sovelluksen jumiin tai kaatumaan
+muutaman välilehtivaihdon jälkeen. Tietoja-sivu on nyt taas oma välilehtensä,
+kuten ennen 0.5.0:aa. Varoitukset-välilehti säilyy.
+</fi-FI>
+<sv-SE>
+Korrigering: 0.5.0 kraschade vid flikbyte.
+
+Den nya info-knappen fungerade inte, och orsakade att appen låste sig eller
+kraschade efter några flikbyten. Om-sidan är åter en egen flik, som före
+0.5.0. Varningar-fliken finns kvar.
+</sv-SE>
+<en-US>
+Fix: 0.5.0 crashed when switching tabs.
+
+The new info button did not work, and caused the app to lock up or crash
+after a few tab switches. The About page is a tab again, as before 0.5.0.
+The Warnings tab stays.
+</en-US>

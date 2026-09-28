@@ -11,29 +11,36 @@ and AAOS quality review fails on presentation, not on data.
 
 ## 1. Shape
 
-A **Tab template** with three tabs, in the order Road, Weather, Warnings.
+A **Tab template** with **four** tabs, in the order Road, Weather, Warnings, About.
 
-**About is not a tab** (Nico, 2026-09-22). Three tabs is the budget worth spending, and
-attribution does not deserve one of them. Verified against the AAR: the tab strip's own
-header slot cannot hold it — `TabTemplate.setHeaderAction` validates against
+> **Corrected 2026-09-28.** This section specified About reached by an ⓘ action strip
+> instead of a fourth tab. That shipped in 0.5.0 and crashed in the field within hours —
+> full account in §4 and `FIELD-NOTES.md`. The ⓘ approach needs host-verified groundwork
+> before it is tried again; About is a plain fourth tab until then.
+
+~~**About is not a tab**~~ **About is a tab, for now.** The reasoning below explains why a
+fourth tab was worth avoiding, and stands as the case for retrying the ⓘ approach once it
+can actually be verified rather than merely compiled: three tabs is the budget worth
+spending, and attribution does not deserve one of them. Verified against the AAR: the tab
+strip's own header slot cannot hold it — `TabTemplate.setHeaderAction` validates against
 `ACTIONS_CONSTRAINTS_TABS`, which is `ACTIONS_CONSTRAINTS_HEADER` plus
 `addRequiredActionType(65538)`, and `Action.TYPE_APP_ICON == 65538`. That slot is the app
-icon or nothing. The **ActionStrip on each tab's own `ListTemplate`** takes custom actions
-with click listeners (`ACTIONS_CONSTRAINTS_SIMPLE`), so an **ⓘ** there pushes the About
-screen. The licences are still satisfied: the credit is in the app, one tap away.
+icon or nothing. An **ActionStrip on each tab's own `ListTemplate`** was tried as the
+alternative and does not work — see §4.
 
-**The app opens on Weather** (Nico, 2026-09-22): it is what you want when you get in the
-car, and since v1.1 it carries the road reading beside the air one, it is the overview.
-Road stays first in the tab strip and becomes the detail view behind it — one constant in
-`MainScreen` decides the landing tab, so the order and the default can be changed
-independently and cheaply.
+**The app is supposed to open on Weather** (Nico, 2026-09-22) — it is what you want when
+you get in the car, and since v1.1 it carries the road reading beside the air one, so it
+is the overview. **Not actually implemented**: `MainScreen` still defaults
+`activeTab = TAB_ROAD`, and every release through 0.5.1 has opened on Road. Noticed
+2026-09-28 while correcting the item above; recorded here rather than fixed in the same
+commit as a crash revert.
 
 | Tab | Template | Purpose |
 |---|---|---|
 | **Road** | List | Surface temperature, ice risk, condition, 0–12 h outlook |
-| **Weather** | List | Weather and road now, then twelve hours ahead — **the landing tab** |
+| **Weather** | List | Weather and road now, then twelve hours ahead — **the intended landing tab** |
 | **Warnings** | List | FMI land warnings, then road works and notices nearby |
-| *About* | Message | Reached by an **ⓘ** in the action strip, not by a tab |
+| **About** | List | Attribution, disclaimer, version — a fourth tab, not pushed |
 
 No map in v1 — that would pull in `MAP_TEMPLATES`, the Maps SDK and the map-specific
 quality rules (WE-2, WE-5, MR-1) for a forecast strip and a temperature readout that are
@@ -182,11 +189,14 @@ Forecast rows come from `points[]`. `smartsymboltext` gives a plain-language con
 
 ## 4. About screen
 
-> **Shipped in 0.5.0** — reached by the ⓘ action as specified, but as a `ListTemplate`, not
-> the `MessageTemplate` below. The original 0.4.x tab was already a `ListTemplate` and this
-> release only moved it behind the action and pushed it via `ScreenManager` — the app's
-> first pushed `Screen`. Changing the template type was not part of that move and was
-> deliberately left out rather than expanded mid-change. Still open for a later pass.
+> **Reverted in 0.5.1.** 0.5.0 shipped the ⓘ action as specified, and it crashed in the
+> field within hours: the icon never rendered at all — a `ListTemplate`'s own `ActionStrip`
+> is not honoured once wrapped as `TabContents` — and a fresh `Action`/`OnClickListener`
+> closure built on every render meant no two renders of the same tab ever compared equal,
+> which almost certainly spent the five-template quota several times faster than plain tab
+> switching ever had. **About is a fourth tab again**, as it was through 0.1.0–0.4.2. This
+> section's design (ⓘ action, pushed `Screen`) is not built and needs host-verified
+> groundwork — not just a compile pass — before it is tried again.
 
 Reached by the **ⓘ** action, not a tab (§1). A **MessageTemplate**, not a list. As four full-height Rows it dominated the screen for
 content nobody reads twice (Nico, 2026-09-22); a MessageTemplate is one icon and one

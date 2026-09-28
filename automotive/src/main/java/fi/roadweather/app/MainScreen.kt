@@ -6,9 +6,7 @@ import android.text.Spanned
 import androidx.car.app.CarContext
 import androidx.car.app.constraints.ConstraintManager
 import androidx.car.app.Screen
-import androidx.car.app.ScreenManager
 import androidx.car.app.model.Action
-import androidx.car.app.model.ActionStrip
 import androidx.car.app.model.CarColor
 import androidx.car.app.model.CarIcon
 import androidx.car.app.model.ForegroundCarColorSpan
@@ -44,12 +42,23 @@ private const val MOVED_ENOUGH_M = 2_000f
 private const val TAB_ROAD = "road"
 private const val TAB_WEATHER = "weather"
 private const val TAB_WARNINGS = "warnings"
+private const val TAB_ABOUT = "about"
 
 /**
- * The three tabs — Road, Weather, Warnings. [TabTemplate] owns their contents
- * directly, so switching tabs never pushes a screen. About is the one
- * exception: it lives in [AboutScreen], pushed from the ⓘ action on each
- * tab's [ActionStrip] — the app's only other [Screen].
+ * The four tabs — Road, Weather, Warnings, About. [TabTemplate] owns their
+ * contents directly; switching tabs never pushes a screen.
+ *
+ * v0.5.0 tried moving About behind an ⓘ [ActionStrip] action on each tab
+ * instead, pushed via [ScreenManager]. Reverted in v0.5.1 after it crashed in
+ * the field: the icon never rendered at all — a `ListTemplate`'s own
+ * `ActionStrip` is not honoured once that template is wrapped as
+ * [TabContents], only `TabTemplate`'s single header action is — and building
+ * a fresh `Action`/`OnClickListener` closure on every render meant no two
+ * renders of the same tab were ever equal, so the host almost certainly
+ * counted every tab switch as a full new step against the five-template
+ * quota rather than a free refresh. Two taps emptied it; Warnings, hit last,
+ * crashed outright (`FIELD-NOTES.md`, 2026-09-28). Back to four tabs until a
+ * properly host-verified way to reach About exists.
  *
  * Templates are immutable and rebuilt on [invalidate], so state lives here and
  * [onGetTemplate] is a pure render of it.
@@ -289,6 +298,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         builder.addTab(tab(TAB_ROAD, R.string.tab_road, R.drawable.ic_road))
         builder.addTab(tab(TAB_WEATHER, R.string.tab_weather, R.drawable.ic_weather))
         builder.addTab(tab(TAB_WARNINGS, R.string.tab_warnings, R.drawable.ic_warnings))
+        builder.addTab(tab(TAB_ABOUT, R.string.tab_about, R.drawable.ic_info))
         // Without this the host throws "Template requires setting content ID
         // for the active tab when not in Loading state" — the tab list and the
         // contents are matched by id, not by position.
@@ -320,22 +330,43 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         failed && !hasContent -> message(R.string.err_no_connection, R.string.retry) { load() }
         activeTab == TAB_WEATHER -> weatherTemplate()
         activeTab == TAB_WARNINGS -> warningsTemplate()
+        activeTab == TAB_ABOUT -> aboutTemplate()
         else -> roadTemplate()
     }
 
     /**
-     * Pushed onto [ScreenManager] rather than reached by a tab, so Warnings
-     * could have the third slot (`SPEC.md` §1). Uses `ic_info`, the drawable
-     * the old About tab icon already shipped with.
+     * Reverted from a pushed [AboutScreen] in v0.5.1 (see the class doc for
+     * why). Same content that screen had; [AboutScreen] itself stays in the
+     * repo, unused, until a rendering-verified way to reach it exists.
      */
-    private fun infoAction(): Action = Action.Builder()
-        .setIcon(CarIcon.Builder(IconCompat.createWithResource(carContext, R.drawable.ic_info)).build())
-        .setOnClickListener {
-            carContext.getCarService(ScreenManager::class.java).push(AboutScreen(carContext))
-        }
-        .build()
-
-    private fun infoStrip(): ActionStrip = ActionStrip.Builder().addAction(infoAction()).build()
+    private fun aboutTemplate(): Template {
+        val items = ItemList.Builder()
+            .addItem(
+                Row.Builder()
+                    .setTitle(carContext.getString(R.string.about_title))
+                    .addText(BuildConfig.VERSION_NAME)
+                    .build(),
+            )
+            .addItem(
+                Row.Builder()
+                    .setTitle("Data")
+                    .addText(carContext.getString(R.string.about_sources))
+                    .build(),
+            )
+            .addItem(
+                Row.Builder()
+                    .setTitle("—")
+                    .addText(carContext.getString(R.string.about_independent))
+                    .build(),
+            )
+            .addItem(
+                Row.Builder()
+                    .setTitle("—")
+                    .addText(carContext.getString(R.string.about_safety))
+                    .build(),
+            )
+        return ListTemplate.Builder().setSingleList(items.build()).build()
+    }
 
     private fun message(text: Int, actionLabel: Int?, onAction: (() -> Unit)?): Template {
         val b = MessageTemplate.Builder(carContext.getString(text))
@@ -515,7 +546,6 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         }
         return ListTemplate.Builder()
             .setSingleList(items.build())
-            .setActionStrip(infoStrip())
             .build()
     }
 
@@ -559,7 +589,6 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             // empty, so this never claims "no warnings" before it is true.
             return ListTemplate.Builder()
                 .setSingleList(items.build())
-                .setActionStrip(infoStrip())
                 .build()
         }
 
@@ -617,7 +646,6 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
 
         return ListTemplate.Builder()
             .setSingleList(items.build())
-            .setActionStrip(infoStrip())
             .build()
     }
 

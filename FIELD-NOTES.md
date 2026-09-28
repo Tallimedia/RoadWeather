@@ -494,3 +494,40 @@ rather than a misleading date.
 does the back arrow return cleanly to the tab it was on, and — the real question — does
 pushing and popping a screen interact with the template quota any differently than the
 tab-switching this app has only ever done before.
+
+---
+
+# v0.5.0 crashed in the field, reverted in v0.5.1, 2026-09-28
+
+Nico, within hours of uploading v0.5.0: Road opened fine. Tapping Weather didn't switch —
+came back to Road. Second attempt froze the app. Tapping Warnings crashed it outright. No
+ⓘ button was ever visible, on any tab.
+
+**Two separate defects, both invisible to a compile pass:**
+
+1. **The ⓘ icon never rendered.** A `ListTemplate`'s own `ActionStrip` is not honoured once
+   that template is wrapped as `TabContents` inside a `TabTemplate` — only the
+   `TabTemplate`'s single header action (the app icon) is drawn. True from the very first
+   render, before any tab switch, which the screenshot confirms: Road's header showed
+   nothing next to the title.
+2. **Every render built a brand-new `Action` with a brand-new `OnClickListener` closure.**
+   Two closures are never equal to each other even when functionally identical, so the host
+   almost certainly stopped treating any tab switch as a free refresh and counted every one
+   as a full new step against the five-template quota — several times more expensive than
+   plain tab switching had ever cost. Two taps emptied it; Warnings, hit last and heaviest,
+   crashed rather than degraded.
+
+**Fix: revert to four tabs** (Road, Weather, Warnings, About) — the exact pattern stable
+across 0.1.0 through 0.4.2, six releases with no crash of this kind. `AboutScreen.kt`, the
+pushed-`Screen` version, stays in the repo unused and documented rather than deleted — the
+investigative work on `ScreenManager.push()` is real and worth keeping for a properly
+host-verified attempt later, just not this one.
+
+**Also noticed while correcting `SPEC.md`, unrelated to this crash:** the app has never
+actually opened on Weather despite that being the documented decision since 2026-09-22 —
+`activeTab` has defaulted to `TAB_ROAD` in every release. Not fixed here; recorded so it
+is not lost.
+
+**Not yet re-tested in the car.** v0.5.1 needs its own drive: does About-as-a-tab still
+work as it always did, and does Warnings render and survive a full session now that the
+suspect mechanism is gone.
