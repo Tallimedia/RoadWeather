@@ -578,24 +578,52 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
      * marine, and this app is land-only); road works are what makes the tab
      * worth opening most days.
      */
-    private fun warningsTemplate(): Template {
+    /**
+     * The whole body is wrapped, deliberately. v0.5.1 sent this tab out
+     * untested against the real host — no emulator or car was available —
+     * and it failed to open in the field on 2026-09-29 with no stack trace
+     * to work from (`FIELD-NOTES.md`). Checked the library itself
+     * byte-for-byte afterward: `ListTemplate.Builder.build()` does **not**
+     * reject an empty `ItemList` (`RowListConstraints.validateRows` iterates
+     * zero times and returns cleanly), so that specific theory is ruled out
+     * — but something in this function's first real run did not survive,
+     * and there is no way to find out what from a desk. Until this has
+     * actually rendered on the device, any exception here must produce a
+     * working tab instead of taking the whole app down.
+     */
+    private fun warningsTemplate(): Template = try {
+        warningsList()
+    } catch (e: Exception) {
+        ListTemplate.Builder()
+            .setSingleList(
+                ItemList.Builder()
+                    .addItem(
+                        Row.Builder()
+                            .setTitle(carContext.getString(R.string.warnings_error))
+                            .addText(e.message ?: e.javaClass.simpleName)
+                            .build(),
+                    )
+                    .build(),
+            )
+            .build()
+    }
+
+    private fun warningsList(): Template {
         val w = warnings
-        val items = ItemList.Builder()
         val alerts = w?.warnings.orEmpty()
         val notices = w?.roadNotices.orEmpty()
+        val items = ItemList.Builder()
 
-        if (w == null) {
-            // Nothing fetched yet — distinct from a fetch that came back
-            // empty, so this never claims "no warnings" before it is true.
-            return ListTemplate.Builder()
-                .setSingleList(items.build())
-                .build()
-        }
-
-        if (alerts.isEmpty() && notices.isEmpty()) {
-            // A real, designed state, not a placeholder (SPEC.md §4b) —
-            // Utsjoki returns zero of both on a normal day.
-            items.addItem(
+        // Always at least one row — a template with zero rows is not known
+        // to be rejected by the library (checked directly, see above), but
+        // there is no reason to rely on that when a real row costs nothing.
+        when {
+            w == null -> items.addItem(
+                Row.Builder().setTitle(carContext.getString(R.string.loading)).build(),
+            )
+            alerts.isEmpty() && notices.isEmpty() -> items.addItem(
+                // A real, designed state, not a placeholder (SPEC.md §4b) —
+                // Utsjoki returns zero of both on a normal day.
                 Row.Builder().setTitle(carContext.getString(R.string.warnings_none)).build(),
             )
         }

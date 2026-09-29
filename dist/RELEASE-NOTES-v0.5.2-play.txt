@@ -1,0 +1,23 @@
+<fi-FI>
+Korjaus: Varoitukset-välilehti ei auennut.
+
+Ei saatu selville tarkkaa syytä ilman virheilmoitusta, joten välilehti on nyt
+suojattu: jos jokin menee pieleen, se näyttää virheen sisällä eikä koko
+sovellus juutu. Testaa uudelleen — jos virhe näkyy nyt tekstinä, kerro se
+minulle.
+</fi-FI>
+<sv-SE>
+Korrigering: Varningar-fliken öppnades inte.
+
+Kunde inte fastställa exakt orsak utan felmeddelande, så fliken är nu
+skyddad: om något går fel visas felet på fliken i stället för att hela appen
+fastnar. Testa igen — om ett fel visas som text, berätta det för mig.
+</sv-SE>
+<en-US>
+Fix: the Warnings tab did not open.
+
+Could not pin down the exact cause without an error message, so the tab is
+now protected: if something goes wrong, it shows the error inline instead of
+taking down the whole app. Please test again — if an error appears as text,
+send it over.
+</en-US>

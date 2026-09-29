@@ -97,4 +97,6 @@
 
     <string name="restr_path_closed">Jalankulku-/pyörätie kavennettu</string>
     <string name="restr_open_flame">Avotulilämmitin käytössä</string>
+
+    <string name="warnings_error">Varoituksia ei voitu ladata</string>
 </resources>

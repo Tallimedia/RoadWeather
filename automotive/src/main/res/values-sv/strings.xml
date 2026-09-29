@@ -97,4 +97,6 @@
 
     <string name="restr_path_closed">Gång-/cykelväg smalare</string>
     <string name="restr_open_flame">Öppen värmare i bruk</string>
+
+    <string name="warnings_error">Kunde inte läsa in varningar</string>
 </resources>

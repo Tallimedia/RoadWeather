@@ -97,4 +97,6 @@
 
     <string name="restr_path_closed">Footpath/cycle path narrowed</string>
     <string name="restr_open_flame">Open-flame heater</string>
+
+    <string name="warnings_error">Could not load warnings</string>
 </resources>

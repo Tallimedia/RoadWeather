@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.5.2 — 2026-09-29
+
+**Warnings still did not open in 0.5.1** — reported the morning after upload, no stack
+trace available (no emulator or car access from here to reproduce it). Road, Weather and
+About all confirmed working, including no locks and correct live position tracking.
+
+Checked the one concrete theory against the library's actual bytecode before writing
+anything: does `ListTemplate.Builder.build()` reject an empty `ItemList`? **No** —
+`RowListConstraints.validateRows` iterates zero times over an empty list and returns
+cleanly, ruled out directly rather than assumed.
+
+Without a reproducible cause, **`warningsTemplate()` is now wrapped so nothing inside it
+can take the tab down.** Any exception renders as a one-row error message with the
+exception text, instead of the tab silently failing to open or the app locking up. Also
+made unconditionally defensive regardless of what caused this: the function now always
+emits at least one row (a loading row while data is in flight, the existing "no warnings"
+row once it is not), rather than relying on the empty-list case being safe just because
+the library happens to allow it today.
+
+**If the error text shows something concrete on the next test, that closes this properly.**
+Until then this is a containment fix, not a confirmed one.
+
 ## 0.5.1 — 2026-09-28
 
 **Reverts the ⓘ action from 0.5.0.** Found in the field within hours of upload: no info

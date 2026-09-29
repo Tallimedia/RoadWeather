@@ -531,3 +531,32 @@ is not lost.
 **Not yet re-tested in the car.** v0.5.1 needs its own drive: does About-as-a-tab still
 work as it always did, and does Warnings render and survive a full session now that the
 suspect mechanism is gone.
+
+---
+
+# v0.5.1 test: Road/Weather/About confirmed, Warnings still broken, 2026-09-29
+
+Morning test drive. **Road weather works, position updates, no locks — the v0.4.2 fix
+holds.** Normal weather works as before. About works, correctly as a plain fourth tab now
+(the intended outcome of the 0.5.1 revert, not a defect).
+
+**Warnings does not open.** Nico could not recall on reflection whether it failed to
+switch at all or actually crashed — no error screen was captured either way, so there is
+no stack trace to work from.
+
+Checked the one theory that could be verified without a device: does the Car App Library
+reject a `ListTemplate` built from an empty `ItemList`? Disassembled
+`ListTemplate.Builder.build()` and `RowListConstraints.validateRows` directly — **no**, an
+empty list is not rejected at the library level, so `warnings == null` returning zero rows
+was not, by itself, sitting on a documented crash path. Ruled out rather than assumed.
+
+**v0.5.2: hardened rather than guessed at again.** `warningsTemplate()` now wraps its
+entire body in a try/catch that renders the exception message as a plain row instead of
+letting anything propagate, and always emits at least one row regardless of load state
+(a loading row, not an empty list, while `warnings` is still null). This does not identify
+the root cause — it contains it, and turns the next failure into visible text instead of
+silence.
+
+**Next test is the one that actually resolves this.** If the tab opens and shows either
+real content or the new inline error text, this is closed either way — the error text
+becomes the missing stack trace.
