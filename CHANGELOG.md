@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.5.3 — 2026-09-30
+
+**The Warnings tab error is found and fixed, with certainty this time.** The v0.5.2
+try/catch did its job: the next drive surfaced the exact exception instead of a silent
+failure — `"CarSpan type is not allowed: ForegroundCarColorSpan"`.
+
+Confirmed byte-for-byte against the Car App Library AAR (`javap -c -p`, no source
+available): `Row.Builder.setTitle()` validates its `CarText` against
+`CarTextConstraints.TEXT_AND_ICON`, whose allowed span set is `{DistanceSpan, DurationSpan,
+CarIconSpan}` — no colour span. `Row.Builder.addText()` validates against
+`TEXT_WITH_COLORS_AND_ICON`, which does include `ForegroundCarColorSpan`. The Warnings
+tab's severity colouring (`colourSpan(title, cls)` / `colourSpan(titleText, sevCls)`) was
+being applied to row **titles** — the one field that has never allowed it.
+
+**Fix:** moved severity colour off the row title and onto the row's first `addText()` line
+in both the FMI alert rows and the Fintraffic road-notice rows. Titles are now always plain
+text; the colour signal is unchanged in meaning, just relocated to the line already proven
+safe elsewhere in the app (`riskText()`, `staleNote()`, `conditionColoured()`).
+
+**Same bug, fixed pre-emptively in the Road and Weather tabs before it could ever fire
+there.** `roadTemplate()`'s `coloured()` (sub-zero road temperature) and `keliColoured()`
+(winter KELI states), and `weatherRow()`'s reuse of `coloured()` for air temperature, were
+all colouring row titles the identical way. None had crashed yet only because no sub-zero
+reading has occurred this season — this would have broken the same way the first cold
+night. Titles for these rows are now plain; the road-surface and forecast-step rows already
+carry a coloured `addText()` line (`riskText()`, `conditionColoured()`) so no safety signal
+is lost. The condition row gained one: the KELI state is now shown coloured on its own
+`addText()` line rather than in the title. Air temperature in `weatherRow()` is left
+uncoloured — it was never a safety indicator on its own, unlike road surface temperature,
+which keeps its warning via `riskText()`.
+
+The now-unused `coloured()` colour-in-title helper (superseded by plain `temp()` at every
+call site) was removed.
+
 ## 0.5.2 — 2026-09-29
 
 **Warnings still did not open in 0.5.1** — reported the morning after upload, no stack

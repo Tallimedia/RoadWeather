@@ -1,0 +1,21 @@
+<fi-FI>
+Korjaus: Varoitukset-välilehden virhe löytyi ja korjattiin.
+
+Syy oli värillinen teksti otsikkorivillä, jota käyttöliittymäkirjasto ei
+salli. Vakavuusväri näkyy nyt rivin toisella tekstirivillä. Kerro, aukeaako
+välilehti nyt normaalisti.
+</fi-FI>
+<sv-SE>
+Korrigering: felet i Varningar-fliken hittades och åtgärdades.
+
+Orsaken var färgad text på radens rubrikrad, vilket bibliotekets värd inte
+tillåter. Allvarlighetsfärgen visas nu på radens andra textrad i stället.
+Berätta om fliken nu öppnas normalt.
+</sv-SE>
+<en-US>
+Fix: found and fixed the Warnings tab error.
+
+The cause was coloured text on a row's title line, which the car app host
+does not allow there. Severity colour now shows on the row's second text
+line instead. Please let me know if the tab opens normally now.
+</en-US>

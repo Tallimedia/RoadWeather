@@ -424,12 +424,15 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         }
 
         // The headline pairing the whole app exists for: surface temperature,
-        // with the ice verdict immediately under it. Sub-zero is coloured —
-        // it is the number a driver scans for, and at -3 °C it used to look
-        // exactly like +12 °C.
+        // with the ice verdict immediately under it. The title itself can't
+        // carry colour — `Row.setTitle()` validates against
+        // `CarTextConstraints.TEXT_AND_ICON`, which has no `ForegroundCarColorSpan`
+        // in its allowed set (confirmed via bytecode; `Row.addText()` validates
+        // against `TEXT_WITH_COLORS_AND_ICON`, which does) — so the sub-zero
+        // warning lives entirely in the coloured `riskText()` line below.
         items.addItem(
             Row.Builder()
-                .setTitle(labelled(carContext.getString(R.string.road_surface), coloured(surface?.roadTempC)))
+                .setTitle(labelled(carContext.getString(R.string.road_surface), temp(surface?.roadTempC)))
                 .addText(riskText(r?.risk ?: RiskLevel.UNKNOWN))
                 .addText(
                     "${carContext.getString(R.string.air)} ${temp(surface?.airTempC)}  ·  " +
@@ -440,9 +443,10 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
 
         // A broken sensor is missing data, not a surface state. v0.1.0
         // printed "The sensor has a fault" here, right under a reassuring
-        // ice-risk line (FIELD-NOTES.md §3). The four winter KELI states are
-        // coloured; every reading on Finnish roads today is Dry/Moist/Wet,
-        // so this is unexercised until spike S6.
+        // ice-risk line (FIELD-NOTES.md §3). The four winter KELI states get
+        // colour, but only in the addText line below — the title can't carry
+        // it (see the road-surface row above). Every reading on Finnish
+        // roads today is Dry/Moist/Wet, so this is unexercised until spike S6.
         val conditionText = station?.takeUnless { it.conditionFault }?.condition
             ?: carContext.getString(R.string.unavailable)
         val conditionLine = mutableListOf<String>()
@@ -450,7 +454,8 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         station?.saltGM2?.let { conditionLine.add(carContext.getString(R.string.salt, fi1(it))) }
         items.addItem(
             Row.Builder()
-                .setTitle(labelled(carContext.getString(R.string.condition), keliColoured(conditionText, station?.conditionCode)))
+                .setTitle(labelled(carContext.getString(R.string.condition), conditionText))
+                .addText(keliColoured(conditionText, station?.conditionCode))
                 .apply { if (conditionLine.isNotEmpty()) addText(conditionLine.joinToString(" · ")) }
                 .build(),
         )
@@ -476,7 +481,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             steps.take(budget).forEach { s ->
                 val state = humanise(s.surface ?: s.roadCondition)
                 val row = Row.Builder()
-                    .setTitle(labelled(s.at.orEmpty().replace("h", " h"), coloured(s.roadTempC)))
+                    .setTitle(labelled(s.at.orEmpty().replace("h", " h"), temp(s.roadTempC)))
                     .addText(conditionColoured(state))
                 if (!allEstimated && !s.reliable) row.addText(carContext.getString(R.string.no_road_station))
                 items.addItem(row.build())
@@ -564,7 +569,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             popPct?.let { carContext.getString(R.string.rain, it.toInt()) },
         )
         return Row.Builder()
-            .setTitle(labelled(label, coloured(tempCValue)))
+            .setTitle(labelled(label, temp(tempCValue)))
             .apply { if (windParts.isNotEmpty()) addText(windParts.joinToString(" · ")) }
             .apply { if (condLine.isNotEmpty()) addText(condLine.joinToString(" · ")) }
             .build()
@@ -582,14 +587,23 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
      * The whole body is wrapped, deliberately. v0.5.1 sent this tab out
      * untested against the real host — no emulator or car was available —
      * and it failed to open in the field on 2026-09-29 with no stack trace
-     * to work from (`FIELD-NOTES.md`). Checked the library itself
-     * byte-for-byte afterward: `ListTemplate.Builder.build()` does **not**
-     * reject an empty `ItemList` (`RowListConstraints.validateRows` iterates
-     * zero times and returns cleanly), so that specific theory is ruled out
-     * — but something in this function's first real run did not survive,
-     * and there is no way to find out what from a desk. Until this has
-     * actually rendered on the device, any exception here must produce a
-     * working tab instead of taking the whole app down.
+     * to work from (`FIELD-NOTES.md`). v0.5.2's try/catch caught and
+     * surfaced the real cause the next drive: "CarSpan type is not allowed:
+     * ForegroundCarColorSpan", thrown from the severity-coloured row titles
+     * below (`colourSpan(title, cls)` / `colourSpan(titleText, sevCls)`
+     * passed to `.setTitle()`). Confirmed byte-for-byte:
+     * `Row.Builder.setTitle()` validates against
+     * `CarTextConstraints.TEXT_AND_ICON`, whose allowed-span set is
+     * `{DistanceSpan, DurationSpan, CarIconSpan}` — no `ForegroundCarColorSpan`.
+     * `Row.Builder.addText()` validates against
+     * `TEXT_WITH_COLORS_AND_ICON`, which does allow it. Fixed in v0.5.3 by
+     * moving severity colour off the row title and onto the first
+     * `addText()` line instead; the same rule fixed the identical latent
+     * bug in `coloured()`/`keliColoured()` title usage in `roadTemplate()`
+     * and `weatherRow()`, which had just never fired yet (no sub-zero
+     * reading this season — spike S6). The try/catch itself stays, as a
+     * backstop against whatever the next unverifiable-from-a-desk failure
+     * turns out to be.
      */
     private fun warningsTemplate(): Template = try {
         warningsList()
@@ -640,8 +654,14 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             val title = a.event ?: carContext.getString(R.string.warnings_alert_fallback)
             items.addItem(
                 Row.Builder()
-                    .setTitle(if (cls != null) colourSpan(title, cls) else title)
-                    .apply { a.headline?.let { addText(it) } }
+                    .setTitle(title)
+                    .apply {
+                        val headline = a.headline
+                        when {
+                            headline != null && cls != null -> addText(colourSpan(headline, cls))
+                            headline != null -> addText(headline)
+                        }
+                    }
                     .build(),
             )
             used++
@@ -659,13 +679,14 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
                 else -> null
             }
             val titleText = "${fi1(n.distanceKm)} km   $where"
+            val whatText = what.ifEmpty {
+                if (n.type == "ROAD_WORK") carContext.getString(R.string.warnings_road_work)
+                else carContext.getString(R.string.warnings_announcement)
+            }
             items.addItem(
                 Row.Builder()
-                    .setTitle(if (sevCls != null) colourSpan(titleText, sevCls) else titleText)
-                    .addText(what.ifEmpty {
-                        if (n.type == "ROAD_WORK") carContext.getString(R.string.warnings_road_work)
-                        else carContext.getString(R.string.warnings_announcement)
-                    })
+                    .setTitle(titleText)
+                    .addText(if (sevCls != null) colourSpan(whatText, sevCls) else whatText)
                     .apply { untilText(n)?.let { addText(it) } }
                     .build(),
             )
@@ -745,13 +766,6 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
 
     /** One decimal, locale-formatted — the same convention as `temp()`. */
     private fun fi1(v: Double): String = "%.1f".format(v)
-
-    /** Colours a temperature red when it is at or below freezing. */
-    private fun coloured(c: Double?): CharSequence {
-        val text = temp(c)
-        if (c == null || c >= 0.0) return text
-        return colourSpan(text, CarColor.RED)
-    }
 
     /** The four winter KELI/road-condition states get colour; the rest do not.
      * Untestable until spike S6 — every reading today is Dry/Moist/Wet. */

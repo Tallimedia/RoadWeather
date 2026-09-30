@@ -560,3 +560,39 @@ silence.
 **Next test is the one that actually resolves this.** If the tab opens and shows either
 real content or the new inline error text, this is closed either way — the error text
 becomes the missing stack trace.
+
+# v0.5.2 test: Road and Weather confirmed clean, Warnings error captured, 2026-09-29/30
+
+Six screenshots from a test drive. **Road: multiple stations across the drive (St 101
+Espoo Vallikallio → Vt 3 Helsinki Pirkkola → Kt 50 Vantaa Suutarila Länsi), all working,
+position updating correctly, no locks.** Weather working with a live forecast. About
+confirmed showing version 0.5.2 on the fourth tab.
+
+**Warnings: the v0.5.2 try/catch worked exactly as designed** — instead of a silent
+failure or a full app crash, the tab now showed "Varoituksia ei voitu ladata" (Could not
+load warnings) with the actual exception text underneath: **"CarSpan type is not allowed:
+ForegroundCarColorSpan."** This is the first time in this whole sequence the real cause is
+known with certainty rather than inferred.
+
+Confirmed byte-for-byte (`javap -c -p` against the Car App Library AAR, no source
+available): `Row.Builder.setTitle()` validates against `CarTextConstraints.TEXT_AND_ICON`
+— allowed spans `{DistanceSpan, DurationSpan, CarIconSpan}`, no colour. `Row.Builder.addText()`
+validates against `TEXT_WITH_COLORS_AND_ICON`, which does allow `ForegroundCarColorSpan`.
+The Warnings tab's severity colouring was applied via `.setTitle()` — the one field that
+never allowed it. `riskText()` and `staleNote()`, the app's two other colour-span call
+sites, had always gone through `.addText()`, which is why they never failed.
+
+**Also caught two latent instances of the identical bug before they could fire**: the
+`coloured()` helper used in `roadTemplate()`'s surface-temperature row title and forecast
+step titles, and in `weatherRow()`'s title, and `keliColoured()` in the condition row title
+— all colouring titles the same disallowed way. None had crashed yet only because no
+sub-zero reading has occurred this season (spike S6, expected November). Would have broken
+identically the first cold night otherwise.
+
+**v0.5.3 fix:** moved every colour span off row titles and onto the adjoining `addText()`
+line. No safety signal is lost — the road-surface row already carries a coloured
+`riskText()` line, the condition row now carries a coloured KELI-state line, and the
+Warnings rows carry their severity colour on the first text line instead of the title.
+
+**This should be the actual fix, not another containment layer** — the try/catch stays as
+a backstop, but the specific defect it caught is now addressed at its source.
