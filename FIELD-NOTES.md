@@ -596,3 +596,30 @@ Warnings rows carry their severity colour on the first text line instead of the 
 
 **This should be the actual fix, not another containment layer** — the try/catch stays as
 a backstop, but the specific defect it caught is now addressed at its source.
+
+# v0.5.3 confirmed fixed — full Espoo→Vaasa drive, 2026-09-30
+
+20 screenshots, roughly 08:44–12:10, covering the whole drive: Espoo (Nupuri, Kolmiranta) →
+Vihti → Lohja (Salkola) → Huittinen (Korvenmaa) → Kokemäki (Tulkkila) →
+Kristiinankaupunki (Lapväärtti) → Närpiö. **No locks the entire way, confirmed by Nico
+directly** ("no locking while changing stations").
+
+**Warnings tab works.** Both captures (Vihti/Somero area at 09:30, Närpiö at 12:10) show
+real road-notice rows rendering exactly as redesigned: plain white title (e.g. "8,2 km
+Tie 8 · Närpiö"), severity colour on the line below instead of the title (red
+"Hidas työkone · Nopeusrajoitus 50 km/h", orange on lower-severity rows), "Pitkäaikainen"/
+date line under that. This is the first time this tab has rendered real content in the
+field across the whole v0.5.0→v0.5.3 arc — no error screen, no crash, no empty state.
+
+Road and Weather tabs tracked correctly station-by-station the whole route, including
+stations never seen in earlier tests (Lohja, Huittinen, Kokemäki, Kristiinankaupunki,
+Närpiö), each showing plausible live surface temp, condition (all "Kuiva"/"Kostea" — still
+no sub-zero or icy reading, spike S6 still pending), and forecast data. About tab not
+screenshotted this run but no regression reported.
+
+**Closes the defect chain that ran v0.5.0 → v0.5.3**: ⓘ-action crash → revert → Warnings
+silently failing → try/catch containment → `ForegroundCarColorSpan`-on-title identified and
+fixed. Confirmed in the field, not just by bytecode inspection. No open defects from this
+chain remain; `coloured()`/`keliColoured()` on road/weather row titles stays worth watching
+once a sub-zero reading actually occurs (spike S6), since that path is fixed but still
+unexercised with real cold data.
