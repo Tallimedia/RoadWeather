@@ -44,10 +44,15 @@ A frost and ice warning derived from the numbers that decide it: surface tempera
 against freezing, and surface temperature against the dew point. Air temperature above
 zero does not mean the road is.
 
+WARNINGS
+Nearby road notices from Fintraffic — lane closures, roadworks, speed restrictions —
+sorted by distance, plus official weather warnings from the Finnish Meteorological
+Institute. Only what is relevant to where you are.
+
 WEATHER
 Current conditions and the forecast for where you are, from the Finnish Meteorological
 Institute's own post-processed forecast — the same one behind ilmatieteenlaitos.fi, not a
-global model interpolated over Finland.
+global model interpolated over Finland. Forecast hours shown with at-a-glance icons.
 
 BUILT FOR THE CAR
 Driving-optimised screens built with Android's car app templates. Readable at a glance,
@@ -104,9 +109,15 @@ Kuuran ja jään riski lasketaan niistä luvuista, jotka asian ratkaisevat: tien
 lämpötila suhteessa nollaan ja suhteessa kastepisteeseen. Plussan puolella oleva
 ilman lämpötila ei tarkoita, että tiekin olisi.
 
+VAROITUKSET
+Lähialueen tieilmoitukset Fintrafficilta — kaistan sulkeminen, tietyöt, nopeusrajoitukset
+— etäisyyden mukaan järjestettynä, sekä Ilmatieteen laitoksen viralliset säävaroitukset.
+Vain ne, jotka koskevat juuri sinun sijaintiasi.
+
 SÄÄ
 Sen hetkinen sää ja ennuste omalle sijainnillesi Ilmatieteen laitoksen jälkikäsitellystä
-ennusteesta — samasta, joka on ilmatieteenlaitos.fi:n takana.
+ennusteesta — samasta, joka on ilmatieteenlaitos.fi:n takana. Ennustetunnit näkyvät
+kuvakkeilla yhdellä silmäyksellä.
 
 TEHTY AUTOON
 Ajamiseen suunnitellut näkymät Androidin autosovellusmalleilla. Luettavissa yhdellä
@@ -162,9 +173,15 @@ Risken för rimfrost och is räknas fram ur de tal som avgör saken: vägytans t
 noll och mot daggpunkten. Att lufttemperaturen är på plussidan betyder inte att vägen är
 det.
 
+VARNINGAR
+Vägmeddelanden i närheten från Fintraffic — avstängda körfält, vägarbeten,
+hastighetsbegränsningar — sorterade efter avstånd, samt officiella vädervarningar från
+Meteorologiska institutet. Bara det som gäller just din plats.
+
 VÄDER
 Aktuellt väder och prognos för din plats, från Meteorologiska institutets efterbehandlade
-prognos — samma som ligger bakom ilmatieteenlaitos.fi.
+prognos — samma som ligger bakom ilmatieteenlaitos.fi. Prognostimmarna visas med ikoner
+som går att se med en blick.
 
 GJORD FÖR BILEN
 Körvänliga vyer byggda med Androids bilappsmallar. Läsbara med en blick, och inget som
