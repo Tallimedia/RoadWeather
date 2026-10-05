@@ -623,3 +623,22 @@ fixed. Confirmed in the field, not just by bytecode inspection. No open defects 
 chain remain; `coloured()`/`keliColoured()` on road/weather row titles stays worth watching
 once a sub-zero reading actually occurs (spike S6), since that path is fixed but still
 unexercised with real cold data.
+
+# v0.6.0 built — weather icons, not yet field-tested, 2026-10-05
+
+Nico asked to try the graphics/icons on the beta. Added 9 vector drawables
+(`ic_wx_*.xml`) mapped from FMI's `smartsymbol` forecast code (`WeatherIcon.kt`) and
+wired onto each forecast row via `Row.setImage()`. Checked against the AAR first, same
+discipline as every crash in the 0.5.x line: `setImage(CarIcon)` validates against
+`CarIconConstraints.UNCONSTRAINED` and `ROW_CONSTRAINTS_SIMPLE` has
+`setImageAllowed(true)` — icons on these rows are a documented-safe path, not a guess.
+
+**What's unverified, and is the actual point of this build:** whether 9 hand-built
+vector icons are legible at the real row-icon render size on the 800×1280 screen, and
+whether the host's icon tinting (same `?android:attr/colorControlNormal` pattern as the
+existing tab icons) renders them the way they look in a mental model vs. in the car.
+The build compiled clean — a malformed `pathData` fails at `aapt2`, not silently — so
+syntax isn't the risk; legibility is. First thing to check next drive: do "Now"
+(no icon, by design — observations carry no `smartsymbol`) and the forecast rows below
+it look right side by side, and can the icon shape actually be told apart from across
+the car at a glance.

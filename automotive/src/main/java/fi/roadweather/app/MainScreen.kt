@@ -515,9 +515,10 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
      * "Sää nyt · <station>" was found to say "now" three times over (the tab
      * label, the head row and the "Nyt" row below it), so the head row keeps
      * only the station name. Then "Nyt" and every forecast step share the
-     * same shape — icon position (v0.6), title, wind line, condition line —
-     * so the temperature/wind/condition columns are directly comparable
-     * scanning down the screen.
+     * same shape — icon, title, wind line, condition line — so the
+     * temperature/wind/condition columns are directly comparable scanning
+     * down the screen. Icons added in v0.6 (`WeatherIcon.kt`, WE-3); "Nyt"
+     * never gets one since observations carry no `smartsymbol`.
      */
     private fun weatherTemplate(): Template {
         val o = observation
@@ -537,8 +538,11 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             )
         }
 
+        // No icon on "Now": `/v1/observations` is a raw sensor reading, not a
+        // symbolic condition — FMI only assigns a `smartsymbol` to forecast
+        // points, never to an observation (confirmed live, 2026-10-05).
         items.addItem(weatherRow(carContext.getString(R.string.now), o?.tempC, o?.compass,
-            o?.windMs, o?.gustMs, null, null))
+            o?.windMs, o?.gustMs, null, null, null))
 
         // Hourly for the first two steps, then every third (3-hourly beyond
         // that). FMI aligns points to the requested step, so pure 3-hourly
@@ -547,7 +551,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         val budget = (listRowLimit - 2).coerceAtLeast(1)
         listOf(0, 1, 4, 7, 10).take(budget).mapNotNull { forecast.getOrNull(it) }.forEach { p ->
             items.addItem(weatherRow(hhmm(p.epoch), p.tempC, p.compass, p.windMs, p.gustMs,
-                p.symbolText, p.popPct))
+                p.symbolText, p.popPct, p.symbolCode))
         }
         return ListTemplate.Builder()
             .setSingleList(items.build())
@@ -556,7 +560,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
 
     private fun weatherRow(
         label: String, tempCValue: Double?, compass: String?, windMs: Double?, gustMs: Double?,
-        condition: String?, popPct: Double?,
+        condition: String?, popPct: Double?, symbolCode: Int?,
     ): Row {
         val windParts = mutableListOf<String>()
         listOfNotNull(compass, windMs?.let { "%.1f m/s".format(it) })
@@ -572,6 +576,15 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
             .setTitle(labelled(label, temp(tempCValue)))
             .apply { if (windParts.isNotEmpty()) addText(windParts.joinToString(" · ")) }
             .apply { if (condLine.isNotEmpty()) addText(condLine.joinToString(" · ")) }
+            .apply {
+                if (symbolCode != null) {
+                    setImage(
+                        CarIcon.Builder(
+                            IconCompat.createWithResource(carContext, WeatherIcon.forCode(symbolCode)),
+                        ).build(),
+                    )
+                }
+            }
             .build()
     }
 

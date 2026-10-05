@@ -1,0 +1,21 @@
+<fi-FI>
+Uutta: sääikonit ennustenäkymässä.
+
+Jokaisella ennusteen tuntiriveillä on nyt kuvake (aurinkoinen, pilvinen, sade, lumi,
+ukkonen jne.) tekstin lisäksi. Tämä on ensimmäinen versio yhdeksällä kuvakkeella —
+kerro miltä ne näyttävät autossa, tarkempia kuvakkeita voi lisätä myöhemmin.
+</fi-FI>
+<sv-SE>
+Nytt: väderikoner i prognosvyn.
+
+Varje timradad i prognosen har nu en ikon (soligt, molnigt, regn, snö, åska osv.)
+utöver texten. Detta är en första version med nio ikoner — berätta hur de ser ut i
+bilen, fler detaljerade ikoner kan läggas till senare.
+</sv-SE>
+<en-US>
+New: weather icons in the forecast view.
+
+Each hourly forecast row now shows an icon (sunny, cloudy, rain, snow, thunder, etc.)
+alongside the text. This is a first pass with nine icons — let me know how they look
+in the car; more detailed ones can follow.
+</en-US>

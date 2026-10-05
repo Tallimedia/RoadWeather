@@ -180,10 +180,15 @@ From `/v1/observations` and `/v1/forecast`, both already live.
   ...
 ```
 
-Forecast rows come from `points[]`. `smartsymboltext` gives a plain-language condition, so
-**v1 ships without a weather icon set** and satisfies WE-3 with text. FMI's open
-`smartsymbol` graphics are the obvious v1.1 upgrade; note night variants are the day code
-**+100**.
+Forecast rows come from `points[]`. `smartsymboltext` gives a plain-language condition.
+
+> **Icons shipped in v0.6, 2026-10-05.** This section originally said v1 ships text-only
+> and treated `smartsymbol` graphics as a v1.1 upgrade. §9 reframed that: WE-3 *requires*
+> icons on forecast rows, so it was a gap to close before any review past internal
+> testing, not a nicety to defer. v0.6 maps the `smartsymbol` code (`WeatherIcon.kt`) to
+> one of 9 drawables — a first pass, not the full ~15-condition table §9 estimated; see
+> `CHANGELOG.md` 0.6.0 for which codes collapse onto which icon. Night variants are
+> indeed the day code **+100**, confirmed live.
 
 ---
 
@@ -465,4 +470,4 @@ Named so they do not creep in, and so the store listing does not promise them:
   °C, m/s and mm each have exactly one sensible answer here — not because the platform
   says no. **WE-4** does forbid one specific setting: forecast intervals must not be
   customisable via templates.
-- Weather icons — text first, `smartsymbol` graphics in v1.1
+- ~~Weather icons — text first, `smartsymbol` graphics in v1.1~~ **Shipped in v0.6** (§3)

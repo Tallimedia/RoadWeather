@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.6.0 — 2026-10-05
+
+**Weather icons on the forecast rows — the item `SPEC.md` §9 flagged as a likely gap
+at the blocking review** (WE-3: "forecast information must include easily readable
+icons and symbols"). FMI's `smartsymbol` code was already in the backend's
+`/v1/forecast` response (`smartsymbol: 107` alongside the existing
+`smartsymboltext`), so this needed no backend change — only parsing the numeric code
+client-side (`Api.kt`) and mapping it to a drawable (`WeatherIcon.kt`), then wiring it
+onto each forecast `Row` via `setImage()`.
+
+Checked against the AAR before writing any XML: `Row.Builder.setImage(CarIcon)`
+validates against `CarIconConstraints.UNCONSTRAINED`, and the `ListTemplate` row
+constraints used here (`ROW_CONSTRAINTS_SIMPLE`) have `setImageAllowed(true)` — icons
+on these rows are a supported, unconstrained path, not something to find out about in
+the field.
+
+**First pass: 9 drawables, not the ~15 distinct conditions `SPEC.md` estimated.**
+FMI's 107 codes collapse onto them as: drizzle and hail fold into the rain icon; all
+three sleet tiers and all three snow intensities share one snow icon (`WeatherIcon.kt`
+has the full table and the reasoning). The exact wording is still in the text line
+under the icon either way — this collapses *symbol* granularity, not information.
+
+The "Now" row never gets an icon: confirmed live against `/v1/observations` that FMI
+only assigns a `smartsymbol` to forecast points, never to a raw observation — there is
+no code to show.
+
+**Untested in the car — this is what the beta upload is for.** The build compiled
+clean (a malformed vector path fails at `aapt2`, not silently), so the icons are
+syntactically valid; whether they're legible at the actual row-icon size on the real
+800×1280 screen is the open question this version exists to answer.
+
 ## 0.5.3 — 2026-09-30
 
 **The Warnings tab error is found and fixed, with certainty this time.** The v0.5.2

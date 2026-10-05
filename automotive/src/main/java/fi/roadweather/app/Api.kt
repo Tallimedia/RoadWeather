@@ -83,6 +83,8 @@ data class Observation(
 data class ForecastPoint(
     val epoch: Long, val tempC: Double?, val symbolText: String?, val windMs: Double?,
     val gustMs: Double? = null, val compass: String? = null, val popPct: Double? = null,
+    /** FMI's `smartsymbol` code — see `WeatherIcon.kt` for the mapping to a drawable. */
+    val symbolCode: Int? = null,
 )
 
 /** Upstream sometimes reports sensor failure in the value field itself. */
@@ -191,6 +193,7 @@ object Api {
                     p.optLong("epochtime"), p.dbl("temperature"),
                     p.str("smartsymboltext"), p.dbl("windspeedms"),
                     p.dbl("hourlymaximumgust"), p.str("windcompass8"), p.dbl("pop"),
+                    p.intOrNull("smartsymbol"),
                 )
             }
         }
