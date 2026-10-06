@@ -642,3 +642,26 @@ syntax isn't the risk; legibility is. First thing to check next drive: do "Now"
 (no icon, by design — observations carry no `smartsymbol`) and the forecast rows below
 it look right side by side, and can the icon shape actually be told apart from across
 the car at a glance.
+
+# v0.6.0 confirmed — icons render correctly, 2026-10-06
+
+Six screenshots from a short Espoo drive. **Tietoja confirms 0.6.0.** Weather tab:
+"Nyt" correctly has no icon (13,4 °C, no symbol — by design, observations carry no
+`smartsymbol`), and the forecast rows below it each show one. The two daytime rows
+(09:00, 10:00, 13:00, 17:00, 18:00 across the two sessions) all render the sun icon;
+the one dusk row (21:00) renders the crescent-moon icon instead — **the day/night
+split in `WeatherIcon.kt` fired correctly on its own**, nothing hardcoded or
+coincidental about it. Both shapes read cleanly at the actual row size; no
+illegible blob, no missing icon, no crash.
+
+Road and Warnings tabs both working too, unprompted confirmation that nothing
+regressed: Warnings shows a real `Tuulivaroitus maa-alueille` (land wind warning)
+with the severity colour correctly on the text line under the title, not the title
+itself — the v0.5.3 fix still holds. Road tab shows live station data (Kt 51 Espoo
+Kivenlahti), ice risk "Ei liukkausriskiä" (no slip risk) at 11.4 °C surface temp —
+consistent, no sub-zero reading yet.
+
+**v0.6.0 is the new confirmed-working baseline.** Only two of the nine icons
+(clear, clear-night) have actually been seen rendering in the car so far — cloudy,
+fog, rain, snow, thunder, partly-cloudy and partly-cloudy-night remain unverified
+until the weather actually produces those `smartsymbol` codes near the car.
