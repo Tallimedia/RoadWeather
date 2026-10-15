@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.1 — 2026-10-15
+
+**Weather icons bumped from 24dp to 36dp.** Raised by Nico while scoping v1.0 screen
+diversity (`RESEARCH.md` §11): the `WeatherIcon.kt` drawables shipped in v0.6.0 at
+24dp, the smallest of Android Auto's own three documented icon tiers (24/36/44dp),
+below the 36dp the weather-app UX guidelines say icons **should** meet. Confirmed on
+both the AAOS portrait (800×1280, non-Play, the exact match to the real XC60) and
+landscape (1024×768, Play) emulator images before shipping — larger icons render
+cleanly on both, no row overflow, no regression to the content-limit row budget.
+
+No logic changed — only `android:width`/`android:height` on all 9 `ic_wx_*.xml`
+drawables; `android:viewportWidth`/`viewportHeight` (the path coordinate system)
+untouched.
+
 ## 0.6.0 — 2026-10-05
 
 **Weather icons on the forecast rows — the item `SPEC.md` §9 flagged as a likely gap

@@ -665,3 +665,45 @@ consistent, no sub-zero reading yet.
 (clear, clear-night) have actually been seen rendering in the car so far — cloudy,
 fog, rain, snow, thunder, partly-cloudy and partly-cloudy-night remain unverified
 until the weather actually produces those `smartsymbol` codes near the car.
+
+# v0.6.1 — screen diversity emulator check and 36dp icon bump, 2026-10-15
+
+Not a real-car test — this is the first entry in this log from the AAOS emulator
+rather than Nico's XC60, run to answer the question raised in `RESEARCH.md` §11:
+every field test to date is the one portrait car, and the landscape/ultrawide
+emulator profiles scoped weeks ago in §8 had never actually been run.
+
+**Ran the app against two already-provisioned AVDs** (`~/.android/avd/`, no new
+hardware or images needed): `FRW_api33_portrait` (800×1280, non-Play, the exact
+device match to the real XC60) and `FRW_api35_play_landscape` (1024×768, Play,
+device profile `automotive_1024p_landscape`). Both fully headless via `adb` —
+installed the debug APK, granted location permissions, set a fix via
+`adb emu geo fix`, drove the UI with `input tap`, captured frames with
+`screencap -d <display-id>` (the automotive images expose multiple virtual
+displays — cluster at ~528×792, main screen at the AVD's configured resolution;
+had to disambiguate by display id, not assume display 0).
+
+**Landscape confirms the exact concern §11 raised, now seen rather than inferred.**
+Road, Weather and Warnings tabs all render correctly structurally — tabs, rows,
+severity colours on the text line (not the title, confirming the v0.5.3 fix holds
+on this host too) — but the content column only fills roughly 55% of the 1024px
+width, with the right half empty. Not broken, but exactly the "sparse on a wide
+screen" risk flagged from the research alone. Also notable: this Play/landscape
+host **tinted the weather icon blue**, where the real Volvo and the portrait
+emulator both tint it white/monochrome — same `CarIcon`, different host-applied
+colour. Still legible either way, but confirms icon tinting is host-specific, not
+something the app controls or can assume.
+
+**Portrait (the real device's shape) confirms the icon bump is a clean win.** At
+36dp the icons read clearly, six forecast rows fit with room to spare below, no
+layout regression from the 24dp version seen in the field on 2026-10-06.
+
+**Not covered:** no `FRW_ultrawide` AVD exists yet (§8 names the profile,
+3904×1320, but it was never created) — still genuinely unchecked. The emulator's
+own GPS mock needed `adb emu geo fix` *and* a manual Retry tap to actually
+propagate to the app's `Locator` — the first load always showed "No connection"
+(actually a location-fix failure, not a network one; `MainScreen.load()`'s
+`catch (_: Exception)` swallows the real cause rather than logging it, which cost
+real time to diagnose here and would cost more in the field with no logcat access).
+Not touched this round — flagging since it's a second, independent reason the app
+is hard to debug from outside, past the one v0.5.1 already hit.

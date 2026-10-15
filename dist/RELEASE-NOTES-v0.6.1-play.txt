@@ -1,0 +1,18 @@
+<fi-FI>
+Pieni korjaus: sääikonit suurempia.
+
+Ikonit olivat Androidin oman ohjeistuksen pienintä kokoluokkaa. Nyt 36 px, helpompi
+nähdä vilkaisulla.
+</fi-FI>
+<sv-SE>
+Liten justering: väderikonerna är större.
+
+Ikonerna låg i den minsta storleksklassen enligt Androids egna riktlinjer. Nu 36 px,
+lättare att se i en snabb blick.
+</sv-SE>
+<en-US>
+Small fix: weather icons are bigger.
+
+They were at the smallest size tier in Android's own guidelines. Now 36dp, easier to
+read at a glance.
+</en-US>
