@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 HERE = Path(__file__).parent
 
@@ -97,6 +97,33 @@ def frost(img: Image.Image, height: int) -> None:
     img.alpha_composite(overlay)
 
 
+def glow(img: Image.Image, cx: int, cy: int, r: int, colour, strength: int = 140) -> None:
+    """A soft blurred halo — gives a flat readout some depth without detail."""
+    w, h = img.size
+    overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    od = ImageDraw.Draw(overlay)
+    od.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(*colour, strength))
+    overlay = overlay.filter(ImageFilter.GaussianBlur(r * 0.45))
+    img.alpha_composite(overlay)
+
+
+def sheen(img: Image.Image, box: tuple[int, int, int, int]) -> None:
+    """A soft diagonal highlight across a region — reads as a glint off ice,
+    not just a flat dark panel."""
+    x0, y0, x1, y1 = box
+    w, h = img.size
+    overlay = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    od = ImageDraw.Draw(overlay)
+    band = int((x1 - x0) * 0.22)
+    sx = x0 + int((x1 - x0) * 0.62)
+    od.polygon(
+        [(sx, y0), (sx + band, y0), (sx - band * 2, y1), (sx - band * 3, y1)],
+        fill=(*ICE, 55),
+    )
+    overlay = overlay.filter(ImageFilter.GaussianBlur(band * 0.35))
+    img.alpha_composite(overlay)
+
+
 def make_icon() -> None:
     """Legibility at 48 px decides this, not detail at 512.
 
@@ -107,18 +134,74 @@ def make_icon() -> None:
     S = 512
     img = vertical_gradient((S, S), BG_TOP, BG_BOTTOM).convert("RGBA")
     frost(img, int(S * 0.40))
-    d = ImageDraw.Draw(img)
 
     horizon = int(S * 0.62)
+    glow(img, S // 2, int(horizon * 0.42), int(S * 0.34), ICE, strength=110)
+
+    d = ImageDraw.Draw(img)
     road(d, S // 2, horizon, S, int(S * 0.30), int(S * 0.72))
     d.line([(0, horizon), (S, horizon)], fill=ROAD_EDGE, width=5)
+    sheen(img, (0, horizon, S, S))
+    d = ImageDraw.Draw(img)
 
     f = font(216, "bold")
     t = "0°"
     box = d.textbbox((0, 0), t, font=f)
-    d.text(((S - (box[2] - box[0])) / 2 - box[0], horizon - 46 - (box[3] - box[1]) - box[1]),
-           t, font=f, fill=ICE)
+    ty = horizon - 46 - (box[3] - box[1]) - box[1]
+    d.text(((S - (box[2] - box[0])) / 2 - box[0], ty), t, font=f, fill=ICE)
     img.convert("RGB").save(HERE / "icon-512.png")
+
+
+MIPMAP_SIZES = {
+    "mipmap-mdpi": 48,
+    "mipmap-hdpi": 72,
+    "mipmap-xhdpi": 96,
+    "mipmap-xxhdpi": 144,
+    "mipmap-xxxhdpi": 192,
+}
+
+
+def make_launcher_icon() -> None:
+    """The in-app header badge, not the Play Store listing — these are
+    different assets with a different crop. Confirmed from a real screenshot
+    in the car, 2026-10-19: the host circle-crops this one, and the old
+    edge-to-edge composition lost the '0°' top and nearly all of the road
+    once masked. Content here stays inside a ~70%-diameter safe circle,
+    centred; only the background gradient is allowed to bleed to the square
+    edge, which a circular crop removes harmlessly.
+    """
+    S = 1024  # master render; downsampled per density below
+    img = vertical_gradient((S, S), BG_TOP, BG_BOTTOM).convert("RGBA")
+    frost(img, int(S * 0.40))
+
+    scale = 0.70
+    pad = int(S * (1 - scale) / 2)
+    cs = int(S * scale)
+
+    content = Image.new("RGBA", (cs, cs), (0, 0, 0, 0))
+    horizon = int(cs * 0.60)
+    glow(content, cs // 2, int(horizon * 0.42), int(cs * 0.36), ICE, strength=120)
+
+    cd = ImageDraw.Draw(content)
+    road(cd, cs // 2, horizon, cs, int(cs * 0.30), int(cs * 0.74))
+    cd.line([(0, horizon), (cs, horizon)], fill=ROAD_EDGE, width=max(2, cs // 160))
+    sheen(content, (0, horizon, cs, cs))
+
+    cd = ImageDraw.Draw(content)
+    f = font(int(cs * 0.40), "bold")
+    t = "0°"
+    box = cd.textbbox((0, 0), t, font=f)
+    ty = horizon - int(cs * 0.08) - (box[3] - box[1]) - box[1]
+    cd.text(((cs - (box[2] - box[0])) / 2 - box[0], ty), t, font=f, fill=ICE)
+
+    img.alpha_composite(content, (pad, pad))
+    rgb = img.convert("RGB")
+
+    res_dir = HERE.parent / "automotive" / "src" / "main" / "res"
+    for name, size in MIPMAP_SIZES.items():
+        out = res_dir / name / "ic_launcher.png"
+        rgb.resize((size, size), Image.LANCZOS).save(out)
+        print(f"{name}/ic_launcher.png  {size}x{size}  {out.stat().st_size // 1024} kB")
 
 
 def make_feature() -> None:
@@ -138,6 +221,7 @@ def make_feature() -> None:
 
 if __name__ == "__main__":
     make_icon()
+    make_launcher_icon()
     make_feature()
     for p in ("icon-512.png", "feature-1024x500.png"):
         im = Image.open(HERE / p)
