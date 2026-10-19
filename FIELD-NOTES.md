@@ -731,3 +731,55 @@ release. `PLAY-CONSOLE-SETUP.md` §8 has the full account.
 
 Now waiting on Google's review. Next entry here should be whatever comes back —
 approved, rejected, or a request for changes.
+
+# Found: Warnings severity colour missing under the Finnish locale, 2026-10-19
+
+While generating fresh Play/Facebook screenshots (emulator, v0.7.0, Play-enabled
+portrait + landscape AVDs) — not a real-car report, but reproduced twice on two
+different notices, not a one-off capture glitch.
+
+**In English, the Warnings tab's restriction line renders in red/orange per
+severity** — confirmed still working, matches the v0.5.3 fix. **Switching the
+emulator's system language to Finnish (Suomi, via Settings, not the Android 13+
+per-app-locale override — that one didn't even reach the Car App Library's own
+resource resolution, a separate finding below), the exact same notices lose the
+colour** — text renders, correctly translated, just in the default colour instead
+of red/orange. Confirmed live against the backend directly
+(`curl .../v1/warnings?lang=fi`) that the data itself is fine: `severity` is still
+the literal `"HIGHEST"`/`"HIGH"` string Kotlin matches on, locale-invariant, not
+translated. So the bug is client-side, locale-triggered, not a data problem.
+
+**Not yet root-caused.** `n.severity` is checked against literal uppercase
+English-style enum strings that don't change with `lang=fi`, so the obvious
+"string comparison broke because the value got translated" theory doesn't fit.
+One candidate not yet ruled out: Finnish restriction/label text (`restr_*` strings)
+runs longer than English, and the row's secondary text is capped at 2 lines by
+`ROW_CONSTRAINTS_SIMPLE` (`SPEC.md` §off-widget-budget table) — if Finnish text
+pushes a line over its wrap budget, the host might be dropping styling rather than
+truncating, but this is a hypothesis, not confirmed against the AAR the way every
+other finding in this file has been. Needs the same bytecode-first treatment as the
+v0.5.3 crash before touching code.
+
+**Matters more than a cosmetic miss**: Nico's explicit plan is Finnish-language
+screenshots for the Facebook recruitment post, since Finnish owners are the actual
+target audience — and severity colour is the Warnings tab's whole point. Shipping
+promotional screenshots of a tab that's quietly lost its main signal for exactly
+the audience being recruited would be worse than not screenshotting it at all.
+
+**Separate, smaller finding along the way**: `cmd locale set-app-locales` (Android
+13+ per-app language override) reports success and `cmd locale get-app-locales`
+confirms it's set, but the Car App Library's own string resources never picked it
+up — only backend-sourced text (already in Finnish via the `LANG` query param)
+changed. Only a full **system** locale change (Settings → Languages → Suomi)
+actually localises the app's own `strings.xml`. Whether that's expected
+Car-App-Library-host behaviour or something the manifest should declare
+(`android:localeConfig`) is unconfirmed — noted, not chased, since the system-wide
+change is sufficient for testing either way.
+
+**Screenshots captured this session** (`store/captures/`, gitignored, not in git —
+grab them locally before uploading): portrait EN (Road/Weather/Warnings/About),
+landscape EN (Road/Weather/Warnings), landscape FI (Road/Weather/Warnings — the FI
+Warnings one has the colour bug baked in, don't use it for promotion as-is), and a
+Road capture at Inari (68.9°N) showing the coldest live reading found anywhere
+today — 1.1 °C road surface, the first "ice risk: low" seen outside Helsinki-area
+testing.
