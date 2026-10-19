@@ -89,6 +89,14 @@ has only ever been on the internal test track. **Nothing to do while internal-on
 re-check when preparing the first release past internal testing, rather than searching
 Console again before then.
 
+**Re-checked 2026-10-19, while scoping the first open-testing release.** Still not
+there — Nico searched Console (by now switched to English) and confirmed: no trader/DSA
+declaration available or actioned anywhere. The 2026-09-24 prediction holds: this
+almost certainly surfaces during the **open-testing release submission flow itself**,
+not as a standing page to find in advance. **Do not treat this as done or as a blocker**
+— it is simply not reachable yet. Expect it to appear as a step when actually creating
+and submitting the first open-testing release; declare **non-trader** when it does.
+
 ---
 
 ## 3. App content declarations
