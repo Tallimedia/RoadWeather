@@ -783,3 +783,40 @@ Warnings one has the colour bug baked in, don't use it for promotion as-is), and
 Road capture at Inari (68.9°N) showing the coldest live reading found anywhere
 today — 1.1 °C road surface, the first "ice risk: low" seen outside Helsinki-area
 testing.
+
+# v0.7.1 — new app icon, found a real testing-methodology bug along the way, 2026-10-19
+
+Nico flagged the "0°" + road icon as just weak design, not fixable by tweaking the
+same composition again. Landed on a new concept — road-hazard triangle merging into
+a road, snowflake centred inside — after rejecting the AI-generated Finland-map and
+circle+text alternatives (both failed hard at real size, §D8/D9 history) and
+rejecting my own hand-coded PIL version too, for a different reason: visible
+rendering artifacts (line-join seams) Nico spotted immediately. "Your graphics are
+very bad" — correct, the quick `ImageDraw.line()` + corner-circle patches I used
+don't butt-join cleanly the way real vector tooling does.
+
+**The actual bug, worth remembering for next time:** every single AI-generated
+candidate (eight rounds, multiple tools) looked fine at full resolution and
+collapsed into a blob at **true** 48×48px. For a while this looked like a design
+problem — simplify the snowflake, thicker strokes, fewer branches — and none of
+those prompts fixed it. **The real issue was the test, not the art**: I was
+downsampling one big bitmap with Lanczos resampling, which can't guarantee a
+minimum stroke width — any sufficiently fine linework gets blurred away by the
+resize itself, independent of how well-drawn the source is. Nico caught this
+directly: *"you are just using the same image and resizing it. It should be vector
+image to hold pixels."* Confirmed by building a true from-scratch-per-size render
+(fresh geometry at 48px, stroke widths floored in actual pixels, not inherited from
+a bigger master) — it passed the same test the raster versions kept failing.
+
+**What actually shipped is still a raster** (Nico's own exported PNG/JPEG from the
+image-generation tool, not my vector build — rejected separately for the seam
+artifacts above), downsampled the normal way to all five launcher buckets plus the
+512px store icon. It passes from `xhdpi` up and blurs at `mdpi`, same fundamental
+limit as every raster candidate — accepted as a tradeoff rather than chased further,
+since AAOS head units are higher-density screens (`CHANGELOG.md` 0.7.1 has the
+reasoning). The actual production files are now in
+`automotive/src/main/res/mipmap-*/ic_launcher.png` and `store/icon-512.png`.
+
+**Not yet tested in the real car** — only verified via simulated circular-crop
+checks on a laptop. Next drive should confirm the launcher badge actually reads
+correctly on the XC60's own home screen, not just in a Python-simulated mask.

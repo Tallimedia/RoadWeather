@@ -191,11 +191,13 @@ The same attribution has to appear **in the app**, not only in the listing.
 | Feature graphic | 1024×500 |
 | **AAOS screenshots** | **Optional** per the Console. If supplied: ≥2 portrait (800×1280) and ≥2 landscape (1024×768) |
 
-The icon and feature graphic are **generated, not hand-made** — run
-`python3 store/make_store_art.py`, which writes `store/icon-512.png` and
-`store/feature-1024x500.png` in the same dark-navy family as VolvoWatch and
-FIWeatherWatch. Deliberately no screenshots: Play wants real captures, and a drawing of
-a screen that does not exist yet is a lie that has to be redone.
+**Icon changed in v0.7.1** — no longer the `make_store_art.py`-generated navy/"0°"
+design. It's now a hand-picked raster (road-hazard triangle + snowflake, white/black)
+replacing `store/icon-512.png` directly; the generator script still exists and still
+writes `feature-1024x500.png`, but no longer owns the icon — see `CHANGELOG.md` 0.7.1
+and `FIELD-NOTES.md` for the full story of why. Deliberately no generated
+screenshots: Play wants real captures, and a drawing of a screen that does not exist
+yet is a lie that has to be redone.
 
 Capture screenshots from the **generic** emulator AVDs once the app runs —
 `FRW_api35_play_portrait` and `FRW_api35_play_landscape` are sized for exactly this.

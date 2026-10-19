@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.7.1 — 2026-10-19
+
+**New app icon — Play listing and the in-app launcher badge both replaced.** The old
+"0°" + road-perspective design (`store/make_store_art.py`) is retired. New mark: a
+road-hazard triangle merging into a road, with a snowflake centred inside —
+Nico's concept, several rounds of real-size testing to get there (see
+`FIELD-NOTES.md` for the full process, including why AI-generated line art kept
+failing a test that mattered: a big bitmap resized down to 48px loses fine detail
+regardless of how good the source looks, so every candidate had to be checked at
+**actual** launcher size, not just inspected at full resolution).
+
+**Known, accepted tradeoff:** the snowflake reads clearly from `xhdpi` (96px) up,
+including the largest `xxxhdpi` (192px) bucket most modern screens actually use, but
+blurs into an indistinct dot at the smallest `mdpi` bucket (48px). Not fixed —
+AAOS head units are higher-density displays, so `mdpi` is the bucket this app is
+least likely to actually render at. Revisit only if that assumption turns out wrong
+in the field.
+
+Source asset is the artist's own exported PNG/JPEG (not the hand-coded PIL version
+from earlier in the same session, which was rejected for visible rendering
+artifacts — visible line-join seams on the triangle). No app logic changed.
+
 ## 0.7.0 — 2026-10-19
 
 **No code changes — version bump only, for the first closed-testing release.** Play

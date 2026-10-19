@@ -1,0 +1,17 @@
+<en-US>
+New app icon.
+
+A clearer road-hazard symbol, easier to pick out on the car's screen and in the app
+list.
+</en-US>
+<fi-FI>
+Uusi sovelluskuvake.
+
+Selkeämpi tievaarasymboli, helpompi erottaa auton näytöllä ja sovelluslistassa.
+</fi-FI>
+<sv-SE>
+Ny appikon.
+
+En tydligare varningssymbol för väglag, lättare att känna igen på bilens skärm och i
+applistan.
+</sv-SE>
