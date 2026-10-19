@@ -1,0 +1,19 @@
+<en-US>
+Welcome to the closed beta.
+
+Same build as the last internal test — just opened up to more Volvo/AAOS owners. Send
+feedback or anything that looks wrong to iot@tallimedia.com.
+</en-US>
+<fi-FI>
+Tervetuloa suljettuun beta-testiin.
+
+Sama versio kuin viimeisin sisäinen testi — nyt vain avoinna useammalle
+Volvo/AAOS-käyttäjälle. Lähetä palautetta tai havaitsemasi viat osoitteeseen
+iot@tallimedia.com.
+</fi-FI>
+<sv-SE>
+Välkommen till den slutna betan.
+
+Samma version som senaste interna testet — bara öppnad för fler Volvo/AAOS-ägare.
+Skicka feedback eller sånt som ser fel ut till iot@tallimedia.com.
+</sv-SE>
