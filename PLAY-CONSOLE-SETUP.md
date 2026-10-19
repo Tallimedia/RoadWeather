@@ -271,3 +271,65 @@ Looking for a toggle on the centre display is a dead end, so here is the real se
 - **Country targeting does not gate internal testers**, so Finland-only is not a blocker
   here — but the **EU trader status declaration** is still outstanding and does gate
   wider release.
+
+---
+
+## 8. Closed testing — what actually happened, 2026-10-19
+
+First real run through Closed testing, recorded because several things differed from
+what §6–7 (written before any of this existed) assumed.
+
+**Closed testing is not review-free, only not *blocking-reviewed*.** `RESEARCH.md` §7's
+"closed testing is non-blocking" turned out to mean it skips the long **car-quality**
+review, not that it skips review entirely — creating the track still ends in a **"Send
+the release to Google for review"** step, same as any other release. Worth knowing
+going in rather than assuming nothing gets sent to Google until open/production.
+
+**This submission turned out to be the first time *anything* for this app was sent to
+Google, not just the release.** Play's "Publishing overview" batches every unsent
+change together — country targeting (Finland, "confirmed" back in September but never
+actually submitted), the AAOS form factor opt-in, content rating, data safety, ads
+declaration, the store listing itself. All of it went out in one 15-item batch
+alongside the v0.7.0 release. **Internal testing never required any of this to be
+sent** — it's easy to reach "closed testing" believing the app has already cleared
+Google's desk once, when it never has.
+
+**Tester mechanism: email lists or Google Groups, not a shareable link.** Unlike
+Internal testing's opt-in-link flow (§7), Closed testing's Testers page only offers
+these two, as a radio choice — not both at once for one track. A Google Group set to
+"anyone on the web can request to join" (not auto-join) is the closest fit to a public
+Facebook-post recruitment flow: post the group's own join link
+(`https://groups.google.com/g/<name>`), approve requests as they come in, membership
+then grants Play access automatically after a short propagation delay. Created
+`volvo-aaos-test@googlegroups.com` for this.
+
+**Version codes are unique across every track, forever — not per-track.** Re-uploading
+the same `versionCode 12` AAB (already live on Internal) to the new Closed track was
+rejected outright. Bumped to **0.7.0** (not 0.6.2) for two reasons: a new version code
+was mandatory anyway, and this is also the first release aimed at testers outside the
+one car — worth a distinct number rather than folding into the fix-numbering sequence.
+No code changed from 0.6.1.
+
+**Target audience defaulted to 16+ somewhere along the way, caught before
+submission.** `PLAY-CONSOLE-SETUP.md` §3 documents the decision as 13+ with nothing
+excluded (only under-13 triggers Families Policy obligations) — but Console's **Target
+audience and content** page (a separate page from the IARC Content ratings
+questionnaire, easy to confuse) had only 16–17 and 18+ checked. Corrected to include
+13–15 before submitting. **Worth a glance on any future resubmission** in case it
+resets.
+
+**`iot@tallimedia.com` is receive-only — the domain has no outbound SMTP at all.** It
+forwards to `iot@kavaleff.com`, but neither that forward nor the `tallimedia.com`
+domain itself can send mail. The "Feedback URL or email address" field on the Testers
+page needed an address Nico can actually reply from, so it's set to
+**`afterdiver@gmail.com`** instead — his personal account, already tied to the Play
+developer account itself. **This isn't FIRoadWeather-specific**: any other
+`@tallimedia.com` feedback address used elsewhere (other store listings, etc.) has the
+same one-way limitation — worth checking before assuming any of them can be replied
+from directly.
+
+**EU trader/DSA declaration: status after this submission still unconfirmed.** It had
+not surfaced by the time the batch was sent for review (re-checked as absent as
+recently as earlier the same day — §2). Whether it appears once Google finishes
+*reviewing* this submission, rather than at submission time itself, is the next thing
+to watch for.

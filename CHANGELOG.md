@@ -9,6 +9,15 @@ uploaded to), and this is also the first release aimed at testers outside the on
 — marking it 0.7.0 rather than a silent 0.6.2 reflects that it's the closed-beta
 launch build, not a fix. Identical to 0.6.1 otherwise.
 
+**Submitted for Google review 2026-10-19**, alongside every other unsent app-content
+change (country targeting, AAOS form factor opt-in, content rating, data safety, ads
+declaration, store listing) — this was the first review submission for the app at
+all, not just this release. `PLAY-CONSOLE-SETUP.md` §8 has the full account of what
+that actually involved, including two corrections made before submitting: target
+audience had defaulted to 16+ somewhere (fixed back to the documented 13+), and the
+closed-track feedback address moved to `afterdiver@gmail.com` since
+`iot@tallimedia.com` turned out to be receive-only (no SMTP on the domain at all).
+
 ## 0.6.1 — 2026-10-15
 
 **Weather icons bumped from 24dp to 36dp.** Raised by Nico while scoping v1.0 screen

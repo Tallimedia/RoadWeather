@@ -707,3 +707,27 @@ propagate to the app's `Locator` — the first load always showed "No connection
 real time to diagnose here and would cost more in the field with no logcat access).
 Not touched this round — flagging since it's a second, independent reason the app
 is hard to debug from outside, past the one v0.5.1 already hit.
+
+# v0.7.0 submitted for closed testing, 2026-10-19
+
+Not a field test — a Play Console milestone. Walked through creating the Closed
+testing track end to end with Nico live: track named "Suljettu Beta testi", testers
+via a new Google Group (`volvo-aaos-test@googlegroups.com`, set to request-to-join
+rather than invite-only, for a Facebook-post recruitment flow), v0.7.0 uploaded
+(version bump only — Play rejected re-using versionCode 12 across tracks), release
+notes drafted in all three languages.
+
+**Caught and fixed before submitting:** target audience had drifted to 16+-only
+somewhere, re-checked against the documented 13+ decision and corrected. **Caught and
+worked around:** `iot@tallimedia.com` can receive but the domain has no outbound SMTP
+at all — feedback address switched to `afterdiver@gmail.com`.
+
+**The real finding:** clicking through to submit surfaced that this was the first
+time *anything* for this app — not just a release — had ever actually been sent to
+Google. Country targeting, form factor opt-in, content rating, data safety, the store
+listing: all of it had only ever been saved in Console, never submitted, because
+internal testing never required it. Submitted as one 15-item batch alongside the
+release. `PLAY-CONSOLE-SETUP.md` §8 has the full account.
+
+Now waiting on Google's review. Next entry here should be whatever comes back —
+approved, rejected, or a request for changes.
