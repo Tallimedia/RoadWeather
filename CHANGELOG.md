@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.0 — 2026-10-19
+
+**No code changes — version bump only, for the first closed-testing release.** Play
+rejected re-uploading versionCode 12 (already used on the internal track; version
+codes must be unique and increasing across every track, not just the one being
+uploaded to), and this is also the first release aimed at testers outside the one car
+— marking it 0.7.0 rather than a silent 0.6.2 reflects that it's the closed-beta
+launch build, not a fix. Identical to 0.6.1 otherwise.
+
 ## 0.6.1 — 2026-10-15
 
 **Weather icons bumped from 24dp to 36dp.** Raised by Nico while scoping v1.0 screen
