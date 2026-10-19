@@ -203,6 +203,14 @@ Capture screenshots from the **generic** emulator AVDs once the app runs —
 `FRW_api35_play_portrait` and `FRW_api35_play_landscape` are sized for exactly this.
 **Volvo-skinned screenshots are rejected**, so do not photograph the car.
 
+**Main store listing's App icon re-uploaded 2026-10-19**, alongside fresh
+screenshots — the Dashboard preview icon is a separate manual upload from the
+in-app launcher icon shipped in the build (`automotive/src/main/res/mipmap-*`), and
+doesn't update itself on a new release. This was still showing the original "0°"
+icon from early in the project until this upload, despite v0.7.1 already shipping
+the new one in the APK itself — worth remembering next time the icon changes: **two
+places to update, not one.**
+
 ---
 
 ## 5. Store settings and distribution
