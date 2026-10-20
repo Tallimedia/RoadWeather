@@ -820,3 +820,37 @@ reasoning). The actual production files are now in
 **Not yet tested in the real car** — only verified via simulated circular-crop
 checks on a laptop. Next drive should confirm the launcher badge actually reads
 correctly on the XC60's own home screen, not just in a Python-simulated mask.
+
+# v0.7.1 in the real car — first sub-zero data, closes two open questions, 2026-10-20
+
+Four screenshots, 9:03–9:08, Finnish locale throughout.
+
+**Launcher icon confirmed working in the car**, not just in a simulated circular
+mask — the triangle+snowflake badge renders correctly in the header. Tietoja
+confirms version **0.7.1**.
+
+**The Finnish-locale Warnings colour bug (D9, found 2026-10-19 on the emulator)
+does not reproduce here.** Both yellow and red severity colours render correctly
+on real notices, in Finnish, on the real car. Emulator-only, or host-specific —
+not chased further for now, but no longer blocking: the thing testers will
+actually see works.
+
+**First sub-zero reading of the whole project — this is spike S6, arriving for
+real.** Kt 51 Espoo Kivenlahti: surface **0.2 °C**, air **-0.4 °C**, dew point
+**-1.2 °C**. Nico read this as "not seeing any weather icy warning today" —
+worth being precise about why that's correct, not a miss: Fintraffic's own
+sensor reports this stretch salted (`Jäätyy -4.8 °C · suolaa 1.4 g/m²` — freezes
+at -4.8 °C, 1.4 g/m² salt), so the road's *actual* freezing point sits well
+below the raw surface reading. `ice_risk` checks the salted freezing point, not
+a flat 0 °C line — exactly the design `RESEARCH.md` describes, and exactly why
+a naive "below zero = warn" approach would have been a false alarm here. Result
+is the correct **LOW** message ("Tienpinta lähellä nollaa"), and LOW is
+deliberately uncoloured by design (`riskText()` — only HIGH/MODERATE get
+red/yellow). Weather tab separately showed **-1.7 °C** air temp at Espoo
+Tapiola, same morning — the cold snap is real, the app's response to it is
+correct.
+
+**Still unconfirmed**: a KELI code of 5/6/7/9 (frost/snow/ice/slush) actually
+firing the coloured condition line, or a HIGH/MODERATE `ice_risk` actually
+showing red/yellow in the field. Today got close (LOW, salted) but not there
+yet. Worth watching as the cold continues.
