@@ -854,3 +854,27 @@ correct.
 firing the coloured condition line, or a HIGH/MODERATE `ice_risk` actually
 showing red/yellow in the field. Today got close (LOW, salted) but not there
 yet. Worth watching as the cold continues.
+
+# Spike S6 closes — first external tester, first confirmed HIGH/red ice risk, 2026-10-24
+
+Not Nico's car. First real feedback from a closed-beta tester (X/Twitter handle
+`-jyggernaut-`), recruited via the Google Group — the first evidence the beta
+recruitment actually worked, and the first time anyone other than Nico has been
+seen using the app.
+
+**Vt 4 Inari Saariselkä, 05:40, road surface -1.4 °C** — first sub-zero *surface*
+reading in the wild (2026-10-20's Kivenlahti reading was close but above zero and
+salted). This time: **"Kuuraa tai mustaa jäätä"** (Frost or black ice) — the
+`riskText()` **HIGH** message, rendering in **red**. The 2h forecast step shows
+**"Jäinen"** (Icy) — `conditionColoured()`'s red path — also correct. `Jäätyy
+0,0 °C · suolaa 0,0 g/m²`: unsalted this time, freezing point at the raw 0 °C
+line, consistent with the surface reading actually being below it.
+
+**This closes the two paths flagged as unconfirmed on 2026-10-20.** Both the
+HIGH/red `ice_risk` message and a red `conditionColoured()` forecast step are now
+seen working correctly in the field, on a real device that isn't the XC60 used for
+every other test in this log. Spike S6 — unexercised since the project started in
+September — is done. The only remaining colour path never seen live is
+`keliColoured()`'s KELI 5/6/7/9 (frost/snow/ice/slush) on the condition row
+itself; not urgent, the same underlying logic is now proven via the other two
+paths.
