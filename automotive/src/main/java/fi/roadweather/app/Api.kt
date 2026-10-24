@@ -223,6 +223,29 @@ object Api {
         )
     }
 
+    /**
+     * The radar PNG for [RadarScreen]: FMI's national reflectivity composite
+     * centred on the car, drawn server-side (RESEARCH.md §5.5). Same host,
+     * a binary response rather than JSON — [get] can't be reused as-is.
+     */
+    suspend fun radarPng(lat: Double, lon: Double, radiusKm: Int = 50, sizePx: Int = 640): ByteArray =
+        withContext(Dispatchers.IO) {
+            val conn = (URL("$BASE/v1/road/radar?lat=$lat&lon=$lon&radius_km=$radiusKm&size=$sizePx")
+                .openConnection() as HttpURLConnection).apply {
+                connectTimeout = 10_000
+                readTimeout = 15_000
+                setRequestProperty("Accept", "image/png")
+            }
+            try {
+                val code = conn.responseCode
+                if (code == 404) throw OutsideCoverage()
+                if (code !in 200..299) error("HTTP $code")
+                conn.inputStream.use { it.readBytes() }
+            } finally {
+                conn.disconnect()
+            }
+        }
+
     private fun get(path: String): JSONObject {
         val conn = (URL(BASE + path).openConnection() as HttpURLConnection).apply {
             connectTimeout = 10_000

@@ -7,6 +7,13 @@
          fallback to a fixed place in a moving vehicle (SPEC.md §5). -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!-- Rain radar screen (MapWithContentTemplate). MAP_TEMPLATES, not
+         NAVIGATION_TEMPLATES — this app does no turn-by-turn, and Google
+         rejects an app that declares both. ACCESS_SURFACE is required
+         separately to draw into the Surface the host hands the app. -->
+    <uses-permission android:name="androidx.car.app.MAP_TEMPLATES" />
+    <uses-permission android:name="androidx.car.app.ACCESS_SURFACE" />
+
     <!-- Automotive only. This is also what tells Play the app is
          automotive-exclusive, which it cannot know before it sees a bundle. -->
     <uses-feature

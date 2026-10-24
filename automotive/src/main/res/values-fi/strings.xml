@@ -99,4 +99,13 @@
     <string name="restr_open_flame">Avotulilämmitin käytössä</string>
 
     <string name="warnings_error">Varoituksia ei voitu ladata</string>
+
+    <string name="radar_row_title">Sadetutka</string>
+    <string name="radar_row_subtitle">FMI:n tutkakuva, lähelläsi</string>
+    <string name="radar_title">Sadetutka</string>
+    <string name="radar_loading">Ladataan tutkakuvaa…</string>
+    <string name="radar_error">Tutkakuvaa ei voitu ladata</string>
+    <string name="radar_frame_at">Tutka %1$s</string>
+    <string name="radar_attribution">Ilmatieteen laitos, CC BY 4.0</string>
+    <string name="radar_unsupported">Sadetutka vaatii uudemman auton näytön eikä ole käytettävissä tässä</string>
 </resources>

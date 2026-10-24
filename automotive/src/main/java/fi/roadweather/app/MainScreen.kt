@@ -544,11 +544,30 @@ class MainScreen(carContext: CarContext) : Screen(carContext), DefaultLifecycleO
         items.addItem(weatherRow(carContext.getString(R.string.now), o?.tempC, o?.compass,
             o?.windMs, o?.gustMs, null, null, null))
 
+        // Radar needs MapWithContentTemplate, @RequiresCarApi(7) — hidden
+        // rather than crashing on an older host (RESEARCH.md §5.5).
+        val radarEntry = carContext.carAppApiLevel >= 7
+        if (radarEntry) {
+            items.addItem(
+                Row.Builder()
+                    .setTitle(carContext.getString(R.string.radar_row_title))
+                    .addText(carContext.getString(R.string.radar_row_subtitle))
+                    .setOnClickListener {
+                        val fix = currentFix
+                        if (fix != null) {
+                            carContext.getCarService(androidx.car.app.ScreenManager::class.java)
+                                .push(RadarScreen(carContext, fix.latitude, fix.longitude))
+                        }
+                    }
+                    .build(),
+            )
+        }
+
         // Hourly for the first two steps, then every third (3-hourly beyond
         // that). FMI aligns points to the requested step, so pure 3-hourly
         // left a gap of up to three hours before the first row — 2 h 14 min
         // on the drive that found this (FIELD-NOTES.md, 2026-09-23).
-        val budget = (listRowLimit - 2).coerceAtLeast(1)
+        val budget = (listRowLimit - (if (radarEntry) 3 else 2)).coerceAtLeast(1)
         listOf(0, 1, 4, 7, 10).take(budget).mapNotNull { forecast.getOrNull(it) }.forEach { p ->
             items.addItem(weatherRow(hhmm(p.epoch), p.tempC, p.compass, p.windMs, p.gustMs,
                 p.symbolText, p.popPct, p.symbolCode))

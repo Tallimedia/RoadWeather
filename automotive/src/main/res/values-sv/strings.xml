@@ -99,4 +99,13 @@
     <string name="restr_open_flame">Öppen värmare i bruk</string>
 
     <string name="warnings_error">Kunde inte läsa in varningar</string>
+
+    <string name="radar_row_title">Regnradar</string>
+    <string name="radar_row_subtitle">FMI:s radarbild, nära dig</string>
+    <string name="radar_title">Regnradar</string>
+    <string name="radar_loading">Läser in radarbild…</string>
+    <string name="radar_error">Kunde inte läsa in radarbild</string>
+    <string name="radar_frame_at">Radar %1$s</string>
+    <string name="radar_attribution">Meteorologiska institutet, CC BY 4.0</string>
+    <string name="radar_unsupported">Regnradar kräver en nyare bilskärm och är inte tillgänglig här</string>
 </resources>

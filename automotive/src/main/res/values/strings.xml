@@ -99,4 +99,13 @@
     <string name="restr_open_flame">Open-flame heater</string>
 
     <string name="warnings_error">Could not load warnings</string>
+
+    <string name="radar_row_title">Rain radar</string>
+    <string name="radar_row_subtitle">FMI composite, near you</string>
+    <string name="radar_title">Rain radar</string>
+    <string name="radar_loading">Loading radar…</string>
+    <string name="radar_error">Could not load radar</string>
+    <string name="radar_frame_at">Radar %1$s</string>
+    <string name="radar_attribution">Finnish Meteorological Institute, CC BY 4.0</string>
+    <string name="radar_unsupported">Rain radar needs a newer car display and is not available here</string>
 </resources>

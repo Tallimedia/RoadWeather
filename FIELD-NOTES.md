@@ -878,3 +878,80 @@ September — is done. The only remaining colour path never seen live is
 `keliColoured()`'s KELI 5/6/7/9 (frost/snow/ice/slush) on the condition row
 itself; not urgent, the same underlying logic is now proven via the other two
 paths.
+
+# Rain radar v1 built — two silent bugs, one real fix, one real blocker, 2026-10-24
+
+Full technical account in `RESEARCH.md` §5.5; this is the debugging story.
+
+Started from a direct question: *"Where are we with the rain map process? Did
+you build a test view on tallimedia to show that?"* Answer was honest but not
+great — the compositing backend already existed (`FIBikeWeather`'s
+`/v1/bike/radar`) but had never been pointed at this app, and the one open
+design question (`RESEARCH.md`'s own words) was *"how large an image slot
+renders on a 800×1280 portrait screen."* Nico confirmed testing it in the sim,
+"for both screen formats."
+
+**`Pane.setImage()` loses outright.** A throwaway debug tab measured it at
+195×195px portrait, 239×239px landscape — a quarter of the screen, not a
+dashboard. Rebuilt against `MapWithContentTemplate` instead, matched to a
+screenshot Nico sent of Foreca's own AAOS radar screen (full-bleed map,
+floating round action buttons) — confirmed the architecture by reading the
+actual androidx source, not guessing from docs alone.
+
+**Bug 1, immediate crash:** the first debug build added the sizing-test tab as
+a 5th `TabTemplate` tab. `TabTemplate.Builder.build()` throws past 4. Known
+limit, just missed once under the pressure of getting a quick test running.
+
+**Bug 2, much worse — silent.** The finished `RadarScreen` sat on "Loading
+radar…" forever. No crash, no exception anywhere, confirmed via `adb logcat`
+with the right tag filter (the first filtering attempt used invalid logcat
+syntax and looked like total silence from the app — a second, correct capture
+is what actually found nothing, which was itself the real signal). Root cause,
+eventually: `RadarScreen` defined `onCreate`/`onStart`/`onStop` exactly like
+`MainScreen`, but never called `lifecycle.addObserver(this)` in `init {}` the
+way `MainScreen` does — so none of those callbacks, including `onCreate`,
+ever fired. `onGetTemplate()` doesn't care about observer registration and
+rendered the class's default `loading = true` state correctly forever, which
+is exactly what made it look like a hang instead of a wiring bug. A
+genuinely good one to remember: a Screen subclass is not automatically wired
+into its own lifecycle just because it implements `DefaultLifecycleObserver`.
+
+**Confirmed end-to-end in the sim** after both fixes — real FMI data, real
+device render, crosshair on the car's position, back button, attribution,
+frame timestamp all correct.
+
+**Then Nico: "Radar map is very pixelated, that will not do like that."**
+Root cause wasn't the app at all — GeoServer's WMS defaults to
+nearest-neighbour resampling, and at car-screen pixel density the FMI
+composite's native grid is coarser than the output, so both the radar overlay
+and the basemap coastline rendered as visible square blocks. Fixed server-side
+with `interpolations=bilinear,bilinear` on the `GetMap` request, verified live
+against `openwms.fmi.fi` before touching the app again (40 kB nearest vs 82 kB
+bilinear, same bbox). Reinstalled, reconfirmed in the sim — smooth this time.
+
+**Then Nico, on the same build: "now its like looking at the map withour
+eyeglasses and poor near sight."** Exactly right, and a different problem
+than the first complaint — bilinear had traded blocky for blurry without
+adding real detail, because the issue was never the resampling method. FMI's
+own WMS only has one basemap layer at all (`Basemaps:naturalearthgray`,
+confirmed via `GetCapabilities` — nothing finer to switch to), and it's
+genuinely too coarse a dataset for a close-up car view: proved by testing a
+tighter 25 km radius, where even bilinear still showed a smeared coastline.
+No interpolation parameter was ever going to fix a resolution ceiling.
+
+**The real answer, from Nico's own screenshots:** FMI's public sadekartta
+page stays sharp at every zoom (traced down to individual municipalities —
+Pusula, Vihti, Nurmijärvi, Kirkkonummi all legible) because its basemap is
+Maanmittauslaitos's (National Land Survey of Finland) tile service, not a
+single WMS image pull. Right direction, confirmed against the actual
+screenshots rather than assumed — but blocked on an API key only Nico can
+register (MML's OmaTili account service), and MML's own docs caution the open
+interface isn't meant for high-volume production use. Real architecture work
+too: WMTS tile-pyramid fetch-and-stitch, not a URL parameter swap. Logged as
+the next step in `RESEARCH.md` §5.5 rather than guessed at further.
+
+**State as of today: built and verified in the sim, not yet deployed or
+committed.** `RadarScreen.kt`, `/v1/road/radar`, and the bilinear fix all work
+end-to-end against the real FMI feed — the feature doesn't work in the real
+car yet only because the backend change hasn't been deployed to
+`roadweather.tallimedia.com`.
