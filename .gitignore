@@ -28,6 +28,7 @@ keystore.properties
 # Local config / secrets
 .env
 *.env
+MML-api-key
 
 # OS
 .DS_Store
