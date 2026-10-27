@@ -25,7 +25,8 @@ itself or its lifecycle callbacks are silently dead code) — in `claude-docs`'s
 `RESEARCH.md` §5.5 and this repo's own `FIELD-NOTES.md`.
 
 Not yet field-tested in the real car — verified end-to-end in the simulator and against
-the live production backend.
+the live production backend. **Uploaded to Play Console's closed-testing track
+2026-10-27, in review.**
 
 ## 0.7.1 — 2026-10-19
 
