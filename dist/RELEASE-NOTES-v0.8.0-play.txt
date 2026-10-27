@@ -1,0 +1,18 @@
+<en-US>
+Rain radar.
+
+A new screen showing the Finnish Meteorological Institute's rain radar centred on
+where you are, with a detailed background map. Open it from the Weather tab.
+</en-US>
+<fi-FI>
+Sadetutka.
+
+Uusi näyttö, joka näyttää Ilmatieteen laitoksen sadetutkan sijaintisi ympäriltä
+tarkalla taustakartalla. Avaa se Sää-välilehdeltä.
+</fi-FI>
+<sv-SE>
+Regnradar.
+
+En ny vy som visar Meteorologiska institutets regnradar centrerad kring din
+plats, med en detaljerad bakgrundskarta. Öppna den från fliken Väder.
+</sv-SE>

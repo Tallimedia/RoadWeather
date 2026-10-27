@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.8.0 — 2026-10-27
+
+**Rain radar — a new screen on the Weather tab.** FMI's national reflectivity composite
+(`suomi_dbz_eureffin`) centred on the car, with a Maanmittauslaitos (National Land Survey
+of Finland) background map underneath — roads, place names, water, crisp at any zoom,
+not the flat grey basemap an earlier internal build tried first. Reached from a "Rain
+radar" row on the Weather tab, gated to hosts negotiating Car App API level 7 or higher;
+hidden rather than crashing on an older host.
+
+Built on `MapWithContentTemplate`, not `Pane.setImage()` — a throwaway test earlier in
+development found `Pane.setImage()` only renders a 195–239px thumbnail, nowhere near a
+real radar view. The app draws the composited tile directly into the `Surface` the host
+provides via a registered `SurfaceCallback`.
+
+New backend endpoint, `/v1/road/radar`, live on `roadweather.tallimedia.com` — reuses the
+compositing engine already proven in production for `FIBikeWeather`'s `/v1/bike/radar`,
+now also serving the car's larger tile and a Finland-detailed basemap stitched from
+Maanmittauslaitos's open tile service.
+
+Full technical account — including two real bugs found building it (a `TabTemplate` can't
+hold more than 4 tabs; a pushed `Screen` must register `lifecycle.addObserver(this)`
+itself or its lifecycle callbacks are silently dead code) — in `claude-docs`'s
+`RESEARCH.md` §5.5 and this repo's own `FIELD-NOTES.md`.
+
+Not yet field-tested in the real car — verified end-to-end in the simulator and against
+the live production backend.
+
 ## 0.7.1 — 2026-10-19
 
 **New app icon — Play listing and the in-app launcher badge both replaced.** The old

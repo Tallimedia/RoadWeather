@@ -12,6 +12,7 @@ reset it — but that is a support round-trip, not a command.
 | Bundle | versionCode | versionName | Notes |
 |---|---|---|---|
 | `FIRoadWeather-v0.1.0.aab` | 1 | 0.1.0 | First build. For the **internal test track** only. |
+| `FIRoadWeather-v0.8.0.aab` | 15 | 0.8.0 | Rain radar (`RadarScreen`, `MapWithContentTemplate`) — see `CHANGELOG.md` and `claude-docs` `RESEARCH.md` §5.5 for the full build. |
 
 Rebuild with `./gradlew :automotive:bundleRelease`.
 

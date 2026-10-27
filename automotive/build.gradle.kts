@@ -30,8 +30,8 @@ android {
         // Play's target-API rule carves out automotive: new Wear OS and AAOS
         // apps need 35, where ordinary new apps need 36.
         targetSdk = 35
-        versionCode = 14
-        versionName = "0.7.1"
+        versionCode = 15
+        versionName = "0.8.0"
         resourceConfigurations += listOf("en", "fi", "sv")
 
         // The app's own hostname, routed to the shared backend by Traefik the
