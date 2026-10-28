@@ -13,6 +13,7 @@ reset it — but that is a support round-trip, not a command.
 |---|---|---|---|
 | `FIRoadWeather-v0.1.0.aab` | 1 | 0.1.0 | First build. For the **internal test track** only. |
 | `FIRoadWeather-v0.8.0.aab` | 15 | 0.8.0 | Rain radar (`RadarScreen`, `MapWithContentTemplate`) — see `CHANGELOG.md` and `claude-docs` `RESEARCH.md` §5.5 for the full build. |
+| `FIRoadWeather-v0.8.1.aab` | 16 | 0.8.1 | Crash fix: reopening the radar screen a second time crashed the app (stale `SurfaceCallback` registration). Real-car bug report, reproduced and fixed same day. See `CHANGELOG.md`. |
 
 Rebuild with `./gradlew :automotive:bundleRelease`.
 

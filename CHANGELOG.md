@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.8.1 — 2026-10-28
+
+**Fixed a real crash, found in the real car.** Reported by Nico, same-day fix: open the
+rain radar, go back to the Weather tab, open the radar again — the app crashed outright
+to the car's home launcher. Reproduced on the first try in the simulator with the exact
+repro steps, which gave a clean stack trace: `IllegalArgumentException` from native
+`Surface.lockCanvas`, thrown from `RadarScreen.onSurfaceAvailable`.
+
+Root cause: `RadarScreen` registered itself as the car's `SurfaceCallback` in `onCreate`
+but never released that registration when the screen was popped. On reopening, the host
+handed the *new* `RadarScreen` instance a `Surface` that reported `isValid == true` but
+was still stale underneath — `lockCanvas()` threw, uncaught, and took the whole app down.
+`AppManager.setSurfaceCallback`'s own docs name `null` as how to release it; `onStop` now
+does exactly that. Also wrapped `lockCanvas()` itself in a try/catch as a second line of
+defence — an unforeseen edge case on some other head unit now skips one frame instead of
+crashing.
+
+Verified fixed across four consecutive open/back/open cycles in the simulator before
+building this release — not just the one repro that found it.
+
 ## 0.8.0 — 2026-10-27
 
 **Rain radar — a new screen on the Weather tab.** FMI's national reflectivity composite

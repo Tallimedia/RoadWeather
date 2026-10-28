@@ -1,0 +1,18 @@
+<en-US>
+Fixed a crash in the rain radar screen.
+
+Reopening the rain radar after going back to it a second time could crash the app.
+Fixed.
+</en-US>
+<fi-FI>
+Korjattu sadetutkan kaatuminen.
+
+Sadetutkan avaaminen uudelleen sen jälkeen, kun siitä oli palattu takaisin, saattoi
+kaataa sovelluksen. Korjattu.
+</fi-FI>
+<sv-SE>
+Fixade en krasch i regnradarvyn.
+
+Att öppna regnradarn igen efter att ha gått tillbaka till den en andra gång kunde
+krascha appen. Åtgärdat.
+</sv-SE>

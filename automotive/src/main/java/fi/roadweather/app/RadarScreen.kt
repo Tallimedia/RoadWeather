@@ -97,6 +97,15 @@ class RadarScreen(
 
     override fun onStop(owner: LifecycleOwner) {
         Locator.stopUpdates(carContext)
+        // Confirmed crash, real car, 2026-10-28: open radar, back, open radar
+        // again — the host handed the *second* RadarScreen instance a Surface
+        // that passed isValid but threw IllegalArgumentException from native
+        // lockCanvas, killing the app outright. Root cause: the first
+        // instance never released its SurfaceCallback registration when
+        // popped, leaving the host's surface session in a state the next
+        // registration couldn't cleanly take over. AppManager.setSurfaceCallback's
+        // own docs name null as how to release it — this is that release.
+        carContext.getCarService(AppManager::class.java).setSurfaceCallback(null)
     }
 
     private fun load() {
@@ -141,7 +150,16 @@ class RadarScreen(
         val container = surfaceContainer ?: return
         val surface = container.surface ?: return
         if (!surface.isValid) return
-        val canvas: Canvas = surface.lockCanvas(null) ?: return
+        // Defence in depth alongside the onStop cleanup below: isValid can
+        // pass while the host's surface session is still stale underneath
+        // (confirmed live, real car, 2026-10-28 — see onStop), so lockCanvas
+        // itself can still throw. Skipping one frame beats crashing the app.
+        val canvas: Canvas = try {
+            surface.lockCanvas(null) ?: return
+        } catch (e: IllegalArgumentException) {
+            Log.e("RadarScreen", "lockCanvas failed on a surface that reported valid", e)
+            return
+        }
         try {
             canvas.drawColor(Color.BLACK)
             val bmp = bitmap ?: return
