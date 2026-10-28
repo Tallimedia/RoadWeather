@@ -18,7 +18,8 @@ defence — an unforeseen edge case on some other head unit now skips one frame 
 crashing.
 
 Verified fixed across four consecutive open/back/open cycles in the simulator before
-building this release — not just the one repro that found it.
+building this release — not just the one repro that found it. **Uploaded to Play
+Console 2026-10-28.**
 
 ## 0.8.0 — 2026-10-27
 
