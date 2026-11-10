@@ -5,8 +5,9 @@ listing must not describe features the app does not have.
 
 **Limits:** app name 30 · short description 80 · full description 4000.
 
-> **The Finnish and Swedish below are drafts and want a native read before publishing.**
-> The English is the source text; the translations follow it rather than being literal.
+> **fi-FI reviewed and finalized by Nico (native speaker), 2026-11-10.** sv-SE is still
+> a draft and wants a native read before publishing. The English is the source text;
+> the translations follow it rather than being literal.
 
 ---
 
@@ -95,14 +96,14 @@ Keli, liukkausvaroitus ja Suomen sää suoraan auton näytölle.
 ```
 Suomen oma tie- ja säädata autossa.
 
-FIRoadWeather näyttää, mitä suomalaiset mittalaitteet raportoivat juuri nyt:
+Suomen Tiesää appi näyttää, mitä suomalaiset mittalaitteet raportoivat juuri nyt:
 tienpinnan lämpötilan Ilmatieteen laitoksen tiesääasemilta ja kelin Fintrafficin
-anturiverkosta. Ei globaalin mallin arvausta Suomesta.
+anturiverkosta.
 
 TIENPINTA
 Tienpinnan lämpötila lähimmältä tiesääasemalta, aseman nimi ja etäisyys näkyvissä, jotta
 tiedät mistä lukema on peräisin. Keli — kuiva, kostea, märkä tai huonompi — Fintrafficin
-omista antureista, sekä keliennuste tuleville tunneille omalla tieosuudellasi.
+omista antureista, sekä keliennuste tuleville tunneille ajamallasi tieosuudellasi.
 
 LIUKKAUSVAROITUS
 Kuuran ja jään riski lasketaan niistä luvuista, jotka asian ratkaisevat: tienpinnan
@@ -115,13 +116,12 @@ Lähialueen tieilmoitukset Fintrafficilta — kaistan sulkeminen, tietyöt, nope
 Vain ne, jotka koskevat juuri sinun sijaintiasi.
 
 SÄÄ
-Sen hetkinen sää ja ennuste omalle sijainnillesi Ilmatieteen laitoksen jälkikäsitellystä
-ennusteesta — samasta, joka on ilmatieteenlaitos.fi:n takana. Ennustetunnit näkyvät
-kuvakkeilla yhdellä silmäyksellä.
+Ajantasainen sää ja sääennuste sijaintisi mukaan Ilmatieteen laitoksen jälkikäsitellystä
+ennusteesta. Ennustetunnit näkyvät kuvakkeilla yhdellä silmäyksellä.
 
 TEHTY AUTOON
-Ajamiseen suunnitellut näkymät Androidin autosovellusmalleilla. Luettavissa yhdellä
-silmäyksellä, eikä mitään mikä veisi huomiota enempää kuin pitää.
+Ajamiseen suunnitellut näkymät, luettavissa yhdellä silmäyksellä, eikä mitään mikä veisi
+huomiota enempää kuin pitää.
 
 YKSITYISYYS
 Ei tiliä, ei kirjautumista, ei seurantaa. Sovellus ei tallenna sinusta mitään.
@@ -132,6 +132,8 @@ Keli ja keliennusteet: Lähde: Fintraffic / digitraffic.fi, lisenssi CC 4.0 BY.
 Sovellus on riippumaton eikä kummankaan organisaation hyväksymä tai tukema.
 
 Kattavuus vain Suomessa.
+
+Sovellusta ylläpidetään yksityisvoimin, ei 24/7 palvelulupausta.
 
 Sovellus on tarkoitettu yleiseksi tiedoksi. Se ei korvaa omaa harkintaa, viranomaisten
 varoituksia tai kelin mukaan ajamista.
