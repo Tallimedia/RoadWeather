@@ -7,7 +7,9 @@ as 0.7.0: Play rejects a repeated `versionCode` across every track forever, and 
 (v0.8.1) was already used on closed testing. The EU trader/DSA declaration surfaced as
 predicted during the production submission flow, submitted as an individual. Identical
 to 0.8.1 otherwise. **Sent for Google's production review 2026-11-10** — the full
-review, not closed testing's lighter pass.
+review, not closed testing's lighter pass. **Live on production 2026-11-11** —
+confirmed via Play Console dashboard, rolled out to 100%. First public release.
+`https://play.google.com/store/apps/details?id=fi.roadweather.app`
 
 ## 0.8.1 — 2026-10-28
 
