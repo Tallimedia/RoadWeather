@@ -955,3 +955,46 @@ committed.** `RadarScreen.kt`, `/v1/road/radar`, and the bilinear fix all work
 end-to-end against the real FMI feed — the feature doesn't work in the real
 car yet only because the backend change hasn't been deployed to
 `roadweather.tallimedia.com`.
+
+# Rain radar crashes on reopen — real car, found 2026-10-28, fixed same day
+
+v0.8.0 shipped, uploaded, and cleared into review. Nico's own real-car report,
+with screenshots: *"when I start the app, go to weather, open rain radar, come
+back with the back key, and open up radar again, app crashes."* First real-car
+bug on this feature, and the first one found entirely outside the sim.
+
+**Reproduced on the first attempt in the simulator**, exact repro steps —
+open radar, back, open radar — and it crashed identically, with a clean stack
+trace the real car's screenshots obviously couldn't give:
+
+```
+java.lang.IllegalArgumentException
+    at android.view.Surface.nativeLockCanvas
+    at RadarScreen.draw(RadarScreen.kt:144)
+    at RadarScreen.onSurfaceAvailable(RadarScreen.kt:128)
+```
+
+**Root cause:** `RadarScreen` registers itself as the car's `SurfaceCallback`
+in `onCreate`, but never released that registration when the screen was
+popped. On the second open, a brand-new `RadarScreen` instance also
+registers — but the host hands it a `Surface` that reports `isValid == true`
+while still being stale underneath from the first instance's never-cleaned-up
+session. `lockCanvas()` throws from native code, uncaught, and the whole app
+dies — visible in Nico's third screenshot as a bounce straight out to the
+car's home launcher.
+
+**Fix:** `onStop` now calls `carContext.getCarService(AppManager::class.java)
+.setSurfaceCallback(null)` — `AppManager`'s own docs name `null` as exactly
+how you release it. Added a second line of defence too: `lockCanvas()` itself
+is now wrapped in try/catch, so an unforeseen edge case on some other head
+unit skips a frame instead of crashing the app outright.
+
+**Verified clean across four consecutive open/back/open cycles** in the
+simulator before shipping the fix — not just the one repro that found it.
+Shipped as v0.8.1 (versionCode 16) the same day.
+
+**Lesson, worth remembering for any future `SurfaceCallback` use:** a Screen
+that registers for the shared car surface must explicitly release it when it
+stops being the active screen. Nothing about `isValid` on the `Surface` the
+host hands over can be trusted to catch a stale session — the crash only
+shows up at the actual `lockCanvas()` call.

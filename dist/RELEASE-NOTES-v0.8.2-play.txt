@@ -1,0 +1,27 @@
+<en-US>
+Finnish road conditions, ice risk, weather and rain radar — built for your car's
+screen, on official Finnish data.
+
+Road surface temperature and condition from the nearest Finnish Meteorological
+Institute and Fintraffic road stations, with an ice-risk reading and an outlook for
+the hours ahead. A rain radar screen centred on your position. Finnish weather
+observations and forecast. Send feedback to iot@tallimedia.com.
+</en-US>
+<fi-FI>
+Suomen tieolosuhteet, liukkausriski, sää ja sadetutka — suunniteltu auton näytölle,
+virallisella suomalaisella datalla.
+
+Tienpinnan lämpötila ja keli lähimmältä Ilmatieteen laitoksen ja Fintrafficin
+tieasemalta, liukkausriski ja ennuste tuleville tunneille. Sadetutka sijaintisi
+ympäriltä. Suomen säähavainnot ja ennuste. Lähetä palautetta osoitteeseen
+iot@tallimedia.com.
+</fi-FI>
+<sv-SE>
+Finlands väglag, halkrisk, väder och regnradar — byggt för din bils skärm, med
+officiell finsk data.
+
+Vägytans temperatur och väglag från närmaste Meteorologiska institutets och
+Fintraffics vägstation, med en halkriskbedömning och en prognos för kommande
+timmar. En regnradarvy centrerad kring din plats. Finlands väderobservationer och
+prognos. Skicka feedback till iot@tallimedia.com.
+</sv-SE>

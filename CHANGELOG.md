@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.2 — 2026-11-10
+
+**No code changes — version bump only, for the first production release.** Same reason
+as 0.7.0: Play rejects a repeated `versionCode` across every track forever, and 16
+(v0.8.1) was already used on closed testing. The EU trader/DSA declaration surfaced as
+predicted during the production submission flow, submitted as an individual. Identical
+to 0.8.1 otherwise.
+
 ## 0.8.1 — 2026-10-28
 
 **Fixed a real crash, found in the real car.** Reported by Nico, same-day fix: open the
