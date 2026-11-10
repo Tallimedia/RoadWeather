@@ -6,7 +6,8 @@
 as 0.7.0: Play rejects a repeated `versionCode` across every track forever, and 16
 (v0.8.1) was already used on closed testing. The EU trader/DSA declaration surfaced as
 predicted during the production submission flow, submitted as an individual. Identical
-to 0.8.1 otherwise.
+to 0.8.1 otherwise. **Sent for Google's production review 2026-11-10** — the full
+review, not closed testing's lighter pass.
 
 ## 0.8.1 — 2026-10-28
 
