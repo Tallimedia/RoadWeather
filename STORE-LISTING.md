@@ -5,9 +5,9 @@ listing must not describe features the app does not have.
 
 **Limits:** app name 30 · short description 80 · full description 4000.
 
-> **fi-FI reviewed and finalized by Nico (native speaker), 2026-11-10.** sv-SE is still
-> a draft and wants a native read before publishing. The English is the source text;
-> the translations follow it rather than being literal.
+> **fi-FI reviewed and finalized by Nico (native speaker), 2026-11-10.** en-US and
+> sv-SE updated the same day to match fi-FI's structural edits (Claude's translation).
+> sv-SE in particular is still a draft and wants a native read before publishing.
 
 ---
 
@@ -30,15 +30,15 @@ Road surface conditions, ice risk and Finnish weather, in your car.
 ```
 Finland's own road and weather data, in the car.
 
-FIRoadWeather shows what Finnish instruments are reporting right now — road surface
-temperature from the Finnish Meteorological Institute's road stations, and road surface
-condition from Fintraffic's sensor network. Not a global model's guess at Finland.
+Finnish RoadWeather shows what Finnish instruments are reporting right now — road
+surface temperature from the Finnish Meteorological Institute's road stations, and
+road surface condition from Fintraffic's sensor network.
 
 ROAD SURFACE
 Surface temperature from the nearest road weather station, with the station named and its
 distance shown, so you know where the reading came from. Road condition — dry, moist, wet
 or worse — from Fintraffic's own sensors, plus a road condition outlook for the hours
-ahead on your road section.
+ahead on the road section you're driving.
 
 ICE RISK
 A frost and ice warning derived from the numbers that decide it: surface temperature
@@ -52,12 +52,11 @@ Institute. Only what is relevant to where you are.
 
 WEATHER
 Current conditions and the forecast for where you are, from the Finnish Meteorological
-Institute's own post-processed forecast — the same one behind ilmatieteenlaitos.fi, not a
-global model interpolated over Finland. Forecast hours shown with at-a-glance icons.
+Institute's own post-processed forecast. Forecast hours shown with at-a-glance icons.
 
 BUILT FOR THE CAR
-Driving-optimised screens built with Android's car app templates. Readable at a glance,
-and nothing that asks for attention it should not have.
+Driving-optimised screens, readable at a glance, and nothing that asks for attention it
+should not have.
 
 PRIVACY
 No account, no sign-in, no tracking. The app does not store anything about you.
@@ -70,6 +69,8 @@ license CC 4.0 BY.
 This app is independent and is not affiliated with, or endorsed by, either organisation.
 
 Coverage is Finland only.
+
+The app is maintained independently, with no 24/7 service guarantee.
 
 This app is for general information. It is not a substitute for your own judgement, for
 official warnings, or for driving to the conditions.
@@ -160,15 +161,15 @@ Väglag, halkrisk och finländskt väder direkt på bilens skärm.
 ```
 Finlands egna väg- och väderdata i bilen.
 
-FIRoadWeather visar vad finländska mätinstrument rapporterar just nu: vägytans temperatur
-från Meteorologiska institutets vägväderstationer och väglaget från Fintraffics
-sensornät. Inte en global modells gissning om Finland.
+Finlands vägväder visar vad finländska mätinstrument rapporterar just nu: vägytans
+temperatur från Meteorologiska institutets vägväderstationer och väglaget från
+Fintraffics sensornät.
 
 VÄGYTAN
 Vägytans temperatur från närmaste vägväderstation, med stationens namn och avstånd
 utsatt, så att du vet varifrån värdet kommer. Väglag — torrt, fuktigt, vått eller sämre —
-från Fintraffics egna sensorer, samt en väglagsprognos för de närmaste timmarna på din
-vägsträcka.
+från Fintraffics egna sensorer, samt en väglagsprognos för de närmaste timmarna på
+vägsträckan du kör.
 
 HALKRISK
 Risken för rimfrost och is räknas fram ur de tal som avgör saken: vägytans temperatur mot
@@ -181,13 +182,12 @@ hastighetsbegränsningar — sorterade efter avstånd, samt officiella vädervar
 Meteorologiska institutet. Bara det som gäller just din plats.
 
 VÄDER
-Aktuellt väder och prognos för din plats, från Meteorologiska institutets efterbehandlade
-prognos — samma som ligger bakom ilmatieteenlaitos.fi. Prognostimmarna visas med ikoner
-som går att se med en blick.
+Aktuellt väder och väderprognos för din plats, från Meteorologiska institutets
+efterbehandlade prognos. Prognostimmarna visas med ikoner som går att se med en blick.
 
 GJORD FÖR BILEN
-Körvänliga vyer byggda med Androids bilappsmallar. Läsbara med en blick, och inget som
-kräver mer uppmärksamhet än det ska.
+Körvänliga vyer, läsbara med en blick, och inget som kräver mer uppmärksamhet än det
+ska.
 
 INTEGRITET
 Inget konto, ingen inloggning, ingen spårning. Appen lagrar ingenting om dig.
@@ -198,6 +198,8 @@ Väglag och väglagsprognoser: Källa: Fintraffic / digitraffic.fi, licens CC 4.
 Appen är oberoende och varken godkänd av eller knuten till någon av organisationerna.
 
 Täckning endast i Finland.
+
+Appen underhålls privat, utan 24/7-tjänstegaranti.
 
 Appen är avsedd som allmän information. Den ersätter inte eget omdöme, myndigheternas
 varningar eller att köra efter väglaget.
